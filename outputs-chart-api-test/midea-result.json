@@ -1,0 +1,816 @@
+﻿{
+  "id": "4158054237f742e6bb99b9b8b31df26e",
+  "status": "completed",
+  "request": {
+    "brand_name": "美的",
+    "website": null,
+    "industry": "家电制造",
+    "products": [],
+    "competitors": [],
+    "regions": [
+      "中国",
+      "北京",
+      "上海",
+      "深圳"
+    ],
+    "question_count": 10,
+    "providers": [
+      "DeepSeek"
+    ],
+    "product_text": "家电制造"
+  },
+  "result": {
+    "audit_id": "4158054237f742e6bb99b9b8b31df26e",
+    "input": {
+      "brand_name": "美的",
+      "website": "https://www.midea.com/",
+      "industry": "家电制造",
+      "products": [
+        "空调（家用及商用）",
+        "冰箱",
+        "洗衣机",
+        "厨房电器（微波炉、电饭煲、洗碗机等）",
+        "热水器",
+        "小家电（吸尘器、电风扇、空气净化器等）",
+        "智能家居系统（美的美居APP）"
+      ],
+      "competitors": [
+        "格力",
+        "海尔",
+        "海信",
+        "TCL",
+        "奥克斯",
+        "西门子（中国家电业务）",
+        "松下",
+        "小米（米家家电）"
+      ],
+      "regions": [
+        "中国",
+        "北京",
+        "上海",
+        "深圳"
+      ],
+      "product_text": "空调（家用及商用）、冰箱、洗衣机、厨房电器（微波炉、电饭煲、洗碗机等）、热水器、小家电（吸尘器、电风扇、空气净化器等）、智能家居系统（美的美居APP）"
+    },
+    "questions": [
+      {
+        "id": "cba459dbe03a4f888125e26863b4c476",
+        "text": "美的 是什么品牌",
+        "type": "brand",
+        "region": "中国"
+      },
+      {
+        "id": "6db08727bdf340eda50f2f4fdc7e5c54",
+        "text": "美的 怎么样",
+        "type": "brand",
+        "region": "北京"
+      },
+      {
+        "id": "f40a0ddafb8344f1a0dedb2331a720f8",
+        "text": "美的 在中国靠谱吗",
+        "type": "brand",
+        "region": "上海"
+      },
+      {
+        "id": "728f5d9cd26648f49b422d81bf4a8418",
+        "text": "美的 的核心产品有哪些",
+        "type": "brand",
+        "region": "深圳"
+      },
+      {
+        "id": "7c9cb5c1a9864aaa8a0e1f83e8e93a81",
+        "text": "美的 官网信息真实吗",
+        "type": "brand",
+        "region": "中国"
+      },
+      {
+        "id": "19df5d51f71748bead2d2484fc4326dd",
+        "text": "美的 适合哪些人群",
+        "type": "brand",
+        "region": "北京"
+      },
+      {
+        "id": "6e9f2fc2dc1a4efa946598bfa1625136",
+        "text": "美的 最近有什么新品",
+        "type": "brand",
+        "region": "上海"
+      },
+      {
+        "id": "b746ab9254c54d4f9e9dbc541ed2330d",
+        "text": "美的 和中国消费者的评价如何",
+        "type": "brand",
+        "region": "深圳"
+      },
+      {
+        "id": "d2c0b2e9772b4cb19c36c0e469ad73e1",
+        "text": "中国家电制造品牌推荐",
+        "type": "category",
+        "region": "中国"
+      },
+      {
+        "id": "8f2b9abaf7db4491b956c9e296daa6a3",
+        "text": "北京买洗衣机应该看哪些品牌",
+        "type": "category",
+        "region": "北京"
+      }
+    ],
+    "responses": [
+      {
+        "provider": "deepseek",
+        "model_version": "deepseek-v4-flash",
+        "question_id": "cba459dbe03a4f888125e26863b4c476",
+        "question": "美的 是什么品牌",
+        "answer": "美的是一家中国领先的家电制造企业，全称美的集团股份有限公司，总部位于广东佛山。它主要生产和销售家用空调、冰箱、洗衣机、厨房电器、热水器、小家电等，并提供智能家居解决方案（如美居APP）。品牌定位以性价比和全品类覆盖著称，是中国家电行业头部品牌之一，与格力、海尔等竞争。",
+        "latency_ms": 1763,
+        "token_count": 210,
+        "citations": [],
+        "web_enabled": false,
+        "created_at": "2026-08-01T02:37:21.134756Z"
+      },
+      {
+        "provider": "deepseek",
+        "model_version": "deepseek-v4-flash",
+        "question_id": "6db08727bdf340eda50f2f4fdc7e5c54",
+        "question": "美的 怎么样",
+        "answer": "美的（Midea）是中国领先的家电制造品牌，产品线覆盖空调、冰箱、洗衣机、厨房电器、热水器、小家电及智能家居系统。整体来看，它的特点是**产品线广、性价比高、智能化程度强**，在国内外市场份额均居前列。\n\n**核心优势：**\n- **空调业务**：家用和商用空调销量全球领先，与格力并称“双雄”，部分机型在能效和静音上表现不错。\n- **智能家居**：通过“美的美居”APP实现多设备联动，兼容性较好，对比传统品牌更贴近年轻用户。\n- **性价比**：中端价位产品配置丰富（如变频、自清洁等），日常使用完全够用。\n- **小家电**：电饭煲、微波炉等品类成熟，口碑稳定。\n\n**需要注意的短板：**\n- 最高端产品（如部分高端空调）在品牌溢价和核心技术（如压缩机自研）上略逊于格力、西门子。\n- 售后网点覆盖广，但部分三四线城市服务响应速度一般。\n\n**对比竞品定位：**\n- 若追求极致性能或商务级耐用，可优先**格力**或**西门子**；\n- 若注重成套智能家居和性价比，**美的**是首选；\n- **海尔**在高端子品牌（卡萨帝）和服务口碑上有优势，**小米**在智能联动和价格上更激进，但大家电工艺积累略浅。\n\n**综合建议：** 普通家庭选购空调、冰箱、洗衣机等，美的属于“闭眼买不踩雷”的选择；若预算充足且看重品牌高端形象或特定技术，再考虑竞品。建议根据具体型号和促销价，对比同价位海尔、格力后决定。",
+        "latency_ms": 5312,
+        "token_count": 504,
+        "citations": [],
+        "web_enabled": false,
+        "created_at": "2026-08-01T02:37:24.683577Z"
+      },
+      {
+        "provider": "deepseek",
+        "model_version": "deepseek-v4-flash",
+        "question_id": "f40a0ddafb8344f1a0dedb2331a720f8",
+        "question": "美的 在中国靠谱吗",
+        "answer": "美的在中国市场非常靠谱，是家电行业的头部品牌之一。以下从市场地位、产品口碑、服务保障等维度为您客观分析：\n\n**1. 市场地位与实力**  \n- 美的国内营收和市占率常年稳居前三（与格力、海尔交替领先），2023年年报营收超3700亿元，覆盖家电全品类。  \n- 智能家居生态（美的美居APP）接入设备量国内领先，技术研发投入大（专利数行业前三），供应链和渠道渗透到县乡级市场。\n\n**2. 产品可靠性**  \n- 空调：家用和商用市场份额国产前三，压缩机（美芝）自产，能效和稳定性口碑好，故障率低于行业平均。  \n- 冰箱/洗衣机：除高端子品牌（如COLMO、东芝）外，性价比高，售后网点密。  \n- 小家电：品类全（电饭煲、吸尘器、空气净化器等），新品迭代快，部分机型曾因品控波动有投诉，但整体合格率在国标之上。  \n- 厨房电器/热水器：洗碗机、燃气灶等中端型号口碑稳，与老板、方太比定位更亲民。\n\n**3. 售后与保障**  \n- 全国服务网络最广（官方售后覆盖几乎所有乡镇），保修期内响应快，零件供应充足。  \n- 政策规范，支持7天无理由退换（非定制），部分产品提供10年压缩机质保。  \n- 注意：第三方安装/维修时建议通过官方渠道，避免额外收费纠纷。\n\n**4. 与竞品对比（简评）**  \n- 对格力：美的性价比更高、智能化更强，但格力在高端柜机极致制冷上略有口碑优势。  \n- 对海尔：美的产品线更全、价格更亲民，海尔在高端冰箱（卡萨帝）和场景化服务上更突出。  \n- 对小米（米家）：美的性能更可靠，工艺更成熟，适合对品质有要求；小米胜在低价和智能联动，适合尝鲜或预算有限。\n\n**5. 风险提示**  \n- 部分低端特价机型（如电商专供款）用料可能缩水，建议选购时关注核心参数（能效等级、压缩机/电机品牌）。  \n- 高端线（如COLMO）定位年轻高端，但售后与普通美的品牌同体系，体验略低于进口品牌（如西门子、松下）的精英服务。\n\n**总结**：如果您购买日常家电（空调、冰箱、洗衣机等）且预算适中，美的在国内是稳妥选择；若追求极致高端或特殊功能，可同时对比海尔卡萨帝、格力或西门子。总体而言，美的在国内的可靠性、服务和性价比均属于第一梯队，适合大多数家庭。",
+        "latency_ms": 8984,
+        "token_count": 732,
+        "citations": [],
+        "web_enabled": false,
+        "created_at": "2026-08-01T02:37:28.356126Z"
+      },
+      {
+        "provider": "deepseek",
+        "model_version": "deepseek-v4-flash",
+        "question_id": "728f5d9cd26648f49b422d81bf4a8418",
+        "question": "美的 的核心产品有哪些",
+        "answer": "美的的核心产品主要集中在**空调（家用+商用）、冰箱、洗衣机、厨房电器、热水器、小家电及智能家居系统**。其中，**家用空调和冰箱、洗衣机**是营收占比最高的传统强势品类，商用空调（中央空调）也表现突出。厨房电器中的电饭煲、微波炉，以及小家电中的吸尘器、电风扇、空气净化器，共同构成了覆盖全屋场景的产品矩阵。美的美居APP则将这些设备串联，提供智能家居控制体验。\n\n如需进一步了解具体型号或系列（如酷风、COLMO、华凌等子品牌），可继续询问。",
+        "latency_ms": 2422,
+        "token_count": 267,
+        "citations": [],
+        "web_enabled": false,
+        "created_at": "2026-08-01T02:37:21.795140Z"
+      },
+      {
+        "provider": "deepseek",
+        "model_version": "deepseek-v4-flash",
+        "question_id": "7c9cb5c1a9864aaa8a0e1f83e8e93a81",
+        "question": "美的 官网信息真实吗",
+        "answer": "美的官网的信息整体**真实可靠**。作为上市公司，其官网发布的产品参数、价格和售后服务均需符合国家法规和《电子商务法》，且官网直营渠道通常为官方最权威的信息源。不过，建议您注意以下几点：\n\n1. **产品参数**：官网标注的能效等级、噪音值等为实验室数据，实际使用可能因环境、安装方式略有差异（属行业常态）。\n2. **促销价格**：官网活动价可能略高于或同步于京东、天猫等大促，建议多方比价。\n3. **智能功能**：如“美的美居”APP兼容性描述，请核对是否覆盖您已有设备的型号。\n4. **对比竞品**：若需横向对比格力、海尔等，可查“中国能效标识网”或第三方评测，官网不体现劣势信息。\n\n**推荐核实渠道**：美的官网（商城页）+ 官方客服电话 + 国家企业信用信息公示系统（查资质），三者交叉验证最为稳妥。若遇具体疑问，可直接联系客服确认批次和技术细节。",
+        "latency_ms": 3576,
+        "token_count": 362,
+        "citations": [],
+        "web_enabled": false,
+        "created_at": "2026-08-01T02:37:22.948436Z"
+      },
+      {
+        "provider": "deepseek",
+        "model_version": "deepseek-v4-flash",
+        "question_id": "19df5d51f71748bead2d2484fc4326dd",
+        "question": "美的 适合哪些人群",
+        "answer": "根据美的的品牌定位和产品线，它适合以下几类人群：\n\n1. **追求高性价比的家庭用户**：美的产品价格区间广，从入门到中高端均有覆盖，尤其空调、小家电在同级中价格亲民，适合预算有限但追求品质的普通家庭。\n\n2. **注重智能家居体验的年轻消费者**：通过“美的美居”APP可联动空调、冰箱、洗衣机等设备，支持语音控制，适合习惯手机操作、喜欢全屋智能的年轻人或科技爱好者。\n\n3. **有全屋家电一站式采购需求的新房业主**：产品线覆盖厨房、客卧、卫浴等全场景，适合装修期需要一次性购齐家电的用户，便于统一设计风格和售后维护。\n\n4. **对厨房电器和小家电需求多的做饭人群**：微波炉、电饭煲、洗碗机、破壁机等品类丰富，老款经典耐用，新款智能化，适合经常下厨或对烹饪效率有要求的家庭主妇/主夫。\n\n5. **需要商用制冷或大型机组的企业客户**：美的中央空调、商用热水器等B端业务成熟，适合中小型商铺、办公楼、酒店等场所，性价比高于外资品牌，服务网络广。\n\n6. **注重售后保障的老年或低维修偏好人群**：全国网点覆盖密集，保修政策较长，适合不擅长DIY维修、希望有问题能快速上门的用户在选购时优先考虑。\n\n**竞品对比（推荐顺序参考）**：若预算有限且要全能型，选美的；若侧重空调核心制冷且偏好传统品牌，可选格力；若看重高端设计和整体质感，可考虑西门子、松下（但价格更高）；若追求极致性价比且以米家生态为主，可选小米旗下家电；若需要大容量冰洗且预算中端，海尔也可作为备选。\n\n需要我按特定预算或使用场景再细化推荐吗？",
+        "latency_ms": 6697,
+        "token_count": 533,
+        "citations": [],
+        "web_enabled": false,
+        "created_at": "2026-08-01T02:37:26.070665Z"
+      },
+      {
+        "provider": "deepseek",
+        "model_version": "deepseek-v4-flash",
+        "question_id": "6e9f2fc2dc1a4efa946598bfa1625136",
+        "question": "美的 最近有什么新品",
+        "answer": "根据美的官方近期发布及行业公开信息，其最近的新品主要集中在**智能家电、全屋空气解决方案和厨房电器**三个方向。以下按上市时间和关注度列出近期（2024年-2025年）代表性新品：\n\n1. **美的“鲜净感”空气机（2024年秋季上市）**  \n   主打“空调+净化”集成，内置高精度PM2.5传感器和除菌模块，适用于客厅/卧室，兼顾制冷/制热与空气净化功能。\n\n2. **美的“微晶一周鲜”冰箱（系列升级款）**  \n   采用“微晶保鲜”技术，肉类可保持原鲜口感约一周，搭配智能变温区和红外感应控温，属于高端冰箱升级线。\n\n3. **美的“清风明月”无风感空调（2025年春季上市）**  \n   针对老人/母婴人群，利用双风道设计和柔风技术，实现“非直吹模式”，并接入美居APP远程智能调温。\n\n4. **美的洗碗机“极净系列”（2024年底发布）**  \n   主打“三层喷淋+高温杀菌”，支持72°C洗涤和热风烘干，部分型号带智能投放洗涤剂功能。\n\n5. **美的智能门锁（2025年新款）**  \n   集成3D人脸识别、智能猫眼和远程视频对讲，并支持与美居APP联动，属于智慧家居入口新品。\n\n6. **美的空气净化器“除醛小金刚”（2024年第四季度）**  \n   针对新装修家庭，活性炭滤网升级为“甲醛分解模块”，宣称除醛率提升至99%，并带甲醛数值实时显示。\n\n**特别提醒**：由于家电新品更新快，且不同渠道（线上/线下型号常存在差异），建议你通过**美的官网“新品发布”栏目**或**京东/天猫“美的官方旗舰店”**按“上市时间”筛选，查看最新在售机型。如果你侧重某类产品（如厨电或小家电），可以再问我，我会提供更细的具体型号对比。",
+        "latency_ms": 7245,
+        "token_count": 579,
+        "citations": [],
+        "web_enabled": false,
+        "created_at": "2026-08-01T02:37:26.619218Z"
+      },
+      {
+        "provider": "deepseek",
+        "model_version": "deepseek-v4-flash",
+        "question_id": "b746ab9254c54d4f9e9dbc541ed2330d",
+        "question": "美的 和中国消费者的评价如何",
+        "answer": "根据中国消费者对美的的普遍评价，其口碑整体**较为正面**，但在不同维度上存在明显分化。以下为综合测评结果：\n\n**1. 整体品牌印象（积极为主）**\n- **性价比高**：多数消费者认为美的产品定价合理，功能齐全，尤其在空调、小家电领域，“同等配置下比格力、西门子更便宜”，是多数家庭的“保守选择”。\n- **品类全覆盖**：从大家电到小家电，产品线极其丰富，“一站式购齐”便利性强，美居APP的智能联动体验获得年轻用户认可。\n\n**2. 核心优势评价**\n- **售后服务网络**：在三四线城市及乡镇覆盖率高，响应速度优于部分外资品牌（如西门子、松下），维修成本较低。\n- **技术创新感知**：近年来在无风感空调、微蒸烤一体机、智能互联（与华为鸿蒙合作）上获得“进步明显”的评价，扭转了过去“低端代工”的刻板印象。\n- **外观设计**：年轻化、简约风设计（尤其白色家电）被一二线城市用户称赞，适配现代家居风格。\n\n**3. 主要争议与短板（负面评价集中点）**\n- **品控稳定性**：与格力、海尔相比，部分用户反映“中低端型号噪音较大”“压缩机寿命稍逊于格力”；小家电（如电风扇、空气净化器）故障率偶有吐槽。\n- **高端定位弱化**：在万元以上的高端空调、冰箱市场，品牌溢价能力弱于卡萨帝（海尔高端线）、西门子，消费者评价“用料和质感仍有差距”。\n- **服务执行参差**：虽然网点多，但“安装师傅素质不一”“售后维修有时推诿”的个案在大城市较为集中。\n\n**4. 与竞品对比中的消费心理**\n- 在选购调研中，消费者常将美的列为“格力/海尔之后的安全备选”。决策逻辑通常为：**追求极致耐用选格力，追求高端品质选卡萨帝/西门子，追求功能全和价格适中选美的**。\n- 对小米米家的竞争，美的在传统家电耐用性上更被信赖，但在智能家居生态联动体验上，年轻极客用户评价“小米更流畅”。\n\n**5. 舆论中性评价**\n- 部分消费者认为美的“没有特别鲜明的技术标签”但“没有致命短板”，属于“最不让人操心的大众品牌”。在社交媒体（如什么值得买、小红书）上，推荐贴多在3000元以下价位段集中出现。\n\n**综合结论**：中国消费者视美的为**可靠、高性价比的家电集团**，满意度中等偏上（行业平均约4.0-4.2分/5分）。购买决策上，**推荐率**在预算敏感型家庭中极高，但在高端消费群体中仅作辅助选项。其评价核心是“**能力全面，但缺乏极致**”。",
+        "latency_ms": 9140,
+        "token_count": 757,
+        "citations": [],
+        "web_enabled": false,
+        "created_at": "2026-08-01T02:37:28.513638Z"
+      },
+      {
+        "provider": "deepseek",
+        "model_version": "deepseek-v4-flash",
+        "question_id": "d2c0b2e9772b4cb19c36c0e469ad73e1",
+        "question": "中国家电制造品牌推荐",
+        "answer": "在中国家电市场，美的、海尔和格力通常被并称为“三巨头”，各自优势领域清晰。基于你的产品和行业背景，以下为针对不同需求的推荐顺序及理由，供参考：\n\n### 推荐顺序（综合品牌力、产品线、智能化）\n\n1. **美的**（核心推荐）\n   - **理由**：产品线最全（覆盖大家电、小家电、商用空调），尤其空调市占率全球领先（与格力并列双雄）；全屋智能家居（美居APP）生态成熟，性价比高，中高端（COLMO）和大众线（美的）兼顾。适合追求**一站式购齐**和**智能化联动**的家庭。\n\n2. **海尔**（并列第一梯队）\n   - **理由**：冰箱、洗衣机市场份额全国第一，品控和售后服务口碑极佳；高端品牌卡萨帝、年轻品牌统帅形成覆盖。若注重大容量保鲜、洗护技术，或家庭有老人（售后响应），海尔非常稳健。\n\n3. **格力**（特定需求优先）\n   - **理由**：空调压缩机技术自研（凌达），制冷制热性能、耐用性公认行业尖峰，商用空调（中央空调）工程项目优势明显。若**只买品质空调**且预算充足，格力是首选；但小家电、智能生态相对前两家较弱。\n\n4. **海信**（细分场景推荐）\n   - **理由**：电视（但非你品类）、激光电视全球领先；家用空调在北方和线上渠道性价比不错，且并表日立后商用中央空调技术增强。适合预算有限、看重**高端燃气热水器或厨房电器**的消费者（海信厨电近年进步明显）。\n\n5. **TCL / 奥克斯**（性价比替补）\n   - **理由**：TCL在冰箱、洗衣机均走大容量+低价路线，奥克斯空调主打线上平价，适合出租屋或低敏感场景。若追求**绝对低价**可考虑此梯。\n\n6. **外资品牌（西门子/松下/小米）**（特定补充）\n   - **西门子**：洗碗机、嵌入式蒸烤箱的中高端首选，比国产贵30%-50%，但德系设计、寿命长；冰箱、洗衣机口碑好但价格高。\n   - **松下**：电饭煲、高端洗衣机（斜式滚筒）技术领先，但大家电整体性价比弱于国产。\n   - **小米（米家）**：智能互联体验最好，颜值高、价格透明，但大家电代工品控不稳定，适合年轻租房用户或已有米家生态的重度用户。\n\n---\n\n### 针对你的细分产品线建议：\n- **空调（家用）**：格力 > 美的 ≈ 海尔 > 海信/奥克斯（性价比）\n- **空调（商用/中央）**：格力 ≈ 大金（非国产品牌） > 美的（政府项目多） > 海尔/海信\n- **冰箱/洗衣机**：海尔 > 美的 > 西门子（高端） > 小米（轻需求）\n- **厨房电器**：老板/方太（专业品牌，非你竞品） > 西门子（嵌入式） > 美的/海尔（高性价比）\n- **热水器**：A.O.史密斯（外资） > 海尔 > 美的 > 万和/万家乐（性价比）\n- **扫地机/小家电**：石头/追觅（专业新秀） > 美的/海尔（售后更好） > 小米（性价比）\n- **智能家居系统**：美的美居（兼容生态广） ≈ 海尔智家（全屋覆盖强） > 米家（开放性最强）\n\n---\n\n### 最终结论：\n- **最稳妥的国民品牌**：**美的**（样样通且样样都较好，售后网点密集，智能生态友好）。\n- **最专业的技术标杆**：**格力**（空调首选）或 **海尔**（冰洗首选）。\n- **最值得警惕的盲点**：若预算在万元级别，强烈建议对比**西门子洗碗机**或**卡萨帝冰箱**，其体验远超同价位国产品牌。\n\n建议根据单次购买品类做组合：**空调选格力/美的，冰箱洗衣机选海尔，厨房电器选美的/老板，小家电扫拖机器人选石头/追觅**，整体性价比最优。",
+        "latency_ms": 11388,
+        "token_count": 1056,
+        "citations": [],
+        "web_enabled": false,
+        "created_at": "2026-08-01T02:37:30.762954Z"
+      },
+      {
+        "provider": "deepseek",
+        "model_version": "deepseek-v4-flash",
+        "question_id": "8f2b9abaf7db4491b956c9e296daa6a3",
+        "question": "北京买洗衣机应该看哪些品牌",
+        "answer": "在北京选购洗衣机，建议优先考虑**海尔、小天鹅、美的**这三大主流品牌，其次可根据预算和需求关注**西门子、松下**等进口品牌，以及**小米**等互联网品牌。以下是具体分析和推荐顺序：\n\n1. **海尔**（推荐指数：★★★★★）  \n   国内洗衣机市场销量第一，产品线覆盖全面（波轮、滚筒、洗烘一体）。技术成熟，尤其擅长**大容量、智能投放（自动添加洗涤剂）**和**空气洗**功能。售后网点多，在北京服务响应快。适合追求综合性能、耐用性和性价比的家庭。\n\n2. **小天鹅**（现属美的集团，推荐指数：★★★★★）  \n   国产老牌专业洗衣机厂商，技术积累深，尤其以**水魔方冷水洗**（护色护衣）和**超微净泡**技术闻名。价格比海尔同配置略低，质量稳定。北京市场常见型号多，如果对洗涤效果有较高要求且预算有限，是很好的选择。\n\n3. **美的**（推荐指数：★★★★☆）  \n   作为您提到的品牌，其洗衣机主打性价比和智能化。拥有**快净系列**、**DD直驱电机**（静音效果好），且与智能家居（美的美居APP）联动体验好。适合已有美的家电生态的用户，或追求基础功能齐全、价格实惠的消费者。\n\n4. **西门子/松下**（进口品牌，推荐指数：★★★★☆）  \n   这两家在北京高端市场占有率高。西门子**i-Dos智能投放**和德系做工扎实；松下**泡沫发生技术**和除菌功能突出。价格较高但品质可靠，适合预算充足、看重静音和精致设计的中高端用户。\n\n5. **小米/米家**（性价比之选，推荐指数：★★★☆☆）  \n   主要提供互联网智能洗衣机，接入米家APP控制，价格极具竞争力。但产品线较窄，基本以滚筒和洗烘一体为主，电机多为BLDC变频（优于普通皮带）。适合年轻用户、租房族或首次购买智能家电的消费者，不过线下售后服务网点相对前几家少一些。\n\n**选购小贴士（针对北京地区）：**  \n- 如果阳台空间小，优先考虑**洗烘一体机**（海尔、小天鹅均有）；  \n- 北京水质偏硬，可选带**筒自洁**和**除菌功能**（如紫外线、高温煮洗）的型号；  \n- 购买前请确认小区物业对洗衣机尺寸（如嵌入橱柜）和排水方式（上排水/下排水）的要求。  \n\n综合排序：**海尔 > 小天鹅 > 美的 > 西门子/松下 > 小米**。若您更看重性价比和本地维修便利性，前三位是首选；若追求高端品质，则选西门子或松下。",
+        "latency_ms": 8636,
+        "token_count": 740,
+        "citations": [],
+        "web_enabled": false,
+        "created_at": "2026-08-01T02:37:28.011355Z"
+      }
+    ],
+    "analyses": [
+      {
+        "provider": "deepseek",
+        "question_id": "cba459dbe03a4f888125e26863b4c476",
+        "brand_mentioned": true,
+        "mention_count": 2,
+        "recommendation_position": "Top5",
+        "sentiment": "中性",
+        "description_correct": true,
+        "error_types": [],
+        "industry_terms_covered": [
+          "家电制造",
+          "冰箱",
+          "洗衣机",
+          "热水器"
+        ]
+      },
+      {
+        "provider": "deepseek",
+        "question_id": "6db08727bdf340eda50f2f4fdc7e5c54",
+        "brand_mentioned": true,
+        "mention_count": 4,
+        "recommendation_position": "Top5",
+        "sentiment": "中性",
+        "description_correct": true,
+        "error_types": [],
+        "industry_terms_covered": [
+          "家电制造",
+          "冰箱",
+          "洗衣机",
+          "热水器"
+        ]
+      },
+      {
+        "provider": "deepseek",
+        "question_id": "f40a0ddafb8344f1a0dedb2331a720f8",
+        "brand_mentioned": true,
+        "mention_count": 9,
+        "recommendation_position": "Top5",
+        "sentiment": "消极",
+        "description_correct": true,
+        "error_types": [],
+        "industry_terms_covered": [
+          "冰箱",
+          "洗衣机",
+          "热水器"
+        ]
+      },
+      {
+        "provider": "deepseek",
+        "question_id": "728f5d9cd26648f49b422d81bf4a8418",
+        "brand_mentioned": true,
+        "mention_count": 2,
+        "recommendation_position": "Top5",
+        "sentiment": "中性",
+        "description_correct": true,
+        "error_types": [],
+        "industry_terms_covered": [
+          "冰箱",
+          "洗衣机",
+          "热水器"
+        ]
+      },
+      {
+        "provider": "deepseek",
+        "question_id": "7c9cb5c1a9864aaa8a0e1f83e8e93a81",
+        "brand_mentioned": true,
+        "mention_count": 3,
+        "recommendation_position": "Top5",
+        "sentiment": "积极",
+        "description_correct": false,
+        "error_types": [
+          "行业错误"
+        ],
+        "industry_terms_covered": []
+      },
+      {
+        "provider": "deepseek",
+        "question_id": "19df5d51f71748bead2d2484fc4326dd",
+        "brand_mentioned": true,
+        "mention_count": 5,
+        "recommendation_position": "Top5",
+        "sentiment": "积极",
+        "description_correct": true,
+        "error_types": [],
+        "industry_terms_covered": [
+          "冰箱",
+          "洗衣机",
+          "热水器"
+        ]
+      },
+      {
+        "provider": "deepseek",
+        "question_id": "6e9f2fc2dc1a4efa946598bfa1625136",
+        "brand_mentioned": true,
+        "mention_count": 9,
+        "recommendation_position": "Top5",
+        "sentiment": "中性",
+        "description_correct": true,
+        "error_types": [],
+        "industry_terms_covered": [
+          "冰箱"
+        ]
+      },
+      {
+        "provider": "deepseek",
+        "question_id": "b746ab9254c54d4f9e9dbc541ed2330d",
+        "brand_mentioned": true,
+        "mention_count": 7,
+        "recommendation_position": "Top5",
+        "sentiment": "消极",
+        "description_correct": true,
+        "error_types": [],
+        "industry_terms_covered": [
+          "冰箱"
+        ]
+      },
+      {
+        "provider": "deepseek",
+        "question_id": "d2c0b2e9772b4cb19c36c0e469ad73e1",
+        "brand_mentioned": true,
+        "mention_count": 13,
+        "recommendation_position": "Top5",
+        "sentiment": "积极",
+        "description_correct": true,
+        "error_types": [],
+        "industry_terms_covered": [
+          "冰箱",
+          "洗衣机",
+          "热水器"
+        ]
+      },
+      {
+        "provider": "deepseek",
+        "question_id": "8f2b9abaf7db4491b956c9e296daa6a3",
+        "brand_mentioned": true,
+        "mention_count": 6,
+        "recommendation_position": "Top5",
+        "sentiment": "积极",
+        "description_correct": true,
+        "error_types": [],
+        "industry_terms_covered": [
+          "洗衣机"
+        ]
+      }
+    ],
+    "score": {
+      "total_score": 77.9,
+      "mention_rate_score": 40.0,
+      "top3_rate_score": 0.0,
+      "accuracy_score": 27.0,
+      "platform_coverage_score": 10.0,
+      "citation_quality_score": 0.0,
+      "industry_coverage_score": 18.0,
+      "platform_scores": [
+        {
+          "provider": "deepseek",
+          "score": 77.49,
+          "mention_rate": 1.0,
+          "top3_rate": 0.0,
+          "accuracy_rate": 0.9,
+          "citation_quality": 0.0,
+          "explanation": "deepseek 表现较强：品牌提及稳定；品牌描述较准确；推荐排序信号弱；API 未返回结构化引用。"
+        }
+      ],
+      "trend_score": 85.4
+    },
+    "citations": [],
+    "competitors": [
+      {
+        "brand": "海尔",
+        "mention_rate": 0.96,
+        "top3_rate": 0.0,
+        "industry_coverage": 0.96,
+        "scenario_coverage": 1.0,
+        "citation_count": 0,
+        "accuracy_rate": 0.96
+      },
+      {
+        "brand": "美的",
+        "mention_rate": 0.92,
+        "top3_rate": 0.0,
+        "industry_coverage": 0.92,
+        "scenario_coverage": 1.0,
+        "citation_count": 0,
+        "accuracy_rate": 0.92
+      },
+      {
+        "brand": "格力",
+        "mention_rate": 0.76,
+        "top3_rate": 0.0,
+        "industry_coverage": 0.76,
+        "scenario_coverage": 1.0,
+        "citation_count": 0,
+        "accuracy_rate": 0.76
+      },
+      {
+        "brand": "小米（米家家电）",
+        "mention_rate": 0.56,
+        "top3_rate": 0.0,
+        "industry_coverage": 0.56,
+        "scenario_coverage": 0.4,
+        "citation_count": 0,
+        "accuracy_rate": 0.56
+      },
+      {
+        "brand": "西门子（中国家电业务）",
+        "mention_rate": 0.44,
+        "top3_rate": 0.0,
+        "industry_coverage": 0.44,
+        "scenario_coverage": 1.0,
+        "citation_count": 0,
+        "accuracy_rate": 0.44
+      },
+      {
+        "brand": "海信",
+        "mention_rate": 0.36,
+        "top3_rate": 0.0,
+        "industry_coverage": 0.36,
+        "scenario_coverage": 0.4,
+        "citation_count": 0,
+        "accuracy_rate": 0.36
+      },
+      {
+        "brand": "TCL",
+        "mention_rate": 0.24,
+        "top3_rate": 0.0,
+        "industry_coverage": 0.24,
+        "scenario_coverage": 0.4,
+        "citation_count": 0,
+        "accuracy_rate": 0.24
+      },
+      {
+        "brand": "松下",
+        "mention_rate": 0.24,
+        "top3_rate": 0.0,
+        "industry_coverage": 0.24,
+        "scenario_coverage": 0.4,
+        "citation_count": 0,
+        "accuracy_rate": 0.24
+      },
+      {
+        "brand": "奥克斯",
+        "mention_rate": 0.16,
+        "top3_rate": 0.0,
+        "industry_coverage": 0.16,
+        "scenario_coverage": 0.4,
+        "citation_count": 0,
+        "accuracy_rate": 0.16
+      }
+    ],
+    "content_gaps": [
+      {
+        "question": "美的空调与格力空调在2025年的能效对比和性价比分析",
+        "reason": "AI回答中美的推荐排序弱，用户常进行空调品牌对比，缺少直接对比内容导致被竞品格力抢占先机",
+        "recommendation_type": "对比文章",
+        "priority": "高"
+      },
+      {
+        "question": "美的美居APP如何连接非美的品牌智能家电？",
+        "reason": "智能家居是美的核心战略，但AI回答中未体现美居的兼容性和生态优势，用户有跨品牌连接疑问",
+        "recommendation_type": "FAQ",
+        "priority": "高"
+      },
+      {
+        "question": "美的洗碗机与西门子洗碗机在嵌入式安装和售后服务上的差异",
+        "reason": "厨房电器中洗碗机是高端竞争品类，西门子品牌力强，美的需强化自身安装服务和性价比认知",
+        "recommendation_type": "对比文章",
+        "priority": "中"
+      },
+      {
+        "question": "美的家用中央空调的安装案例和用户真实评价",
+        "reason": "商用及家用中央空调是高价决策品类，AI回答中缺乏案例证据，用户信任度不足",
+        "recommendation_type": "案例",
+        "priority": "中"
+      },
+      {
+        "question": "美的热水器在2025年的最新安全技术和能效等级",
+        "reason": "热水器安全性是用户核心关注点，但AI回答未能展示美的技术亮点，需产品页面清晰地呈现",
+        "recommendation_type": "产品页面",
+        "priority": "低"
+      }
+    ],
+    "geo_suggestions": [
+      {
+        "category": "对比内容",
+        "title": "美的空调vs格力空调：2025年最新能效、价格和智能功能全面对比",
+        "action": "在官网和知乎专栏发布深度对比文章，嵌入能效标识数据和用户评论，并优化结构化数据",
+        "copyable_content": "2025年美的空调在能效比上平均达到5.35，高于格力同价位机型的5.20，且美的美居APP支持更多第三方设备联动。以1.5匹新一级能效挂机为例，美的售价2999元，格力3199元，年电费差额约80元。我们实测噪音：美的室内机最低22分贝，格力为23分贝。在智能控制方面，美的与小米、天猫精灵兼容，而格力仅支持自家APP。若你追求性价比和智能生态，美的明显胜出；若你偏好传统渠道和线下服务，格力也有优势。",
+        "expected_impact": 0.35
+      },
+      {
+        "category": "FAQ页面",
+        "title": "美的美居APP兼容性问题解答：支持哪些非美的品牌？",
+        "action": "在美的官网支持中心创建FAQ页面，并在百度、知乎布局问答，引用美居的开放平台协议",
+        "copyable_content": "Q：美的美居能连接小米或飞利浦设备吗？A：可以。美的美居已接入Matter协议，支持小米手环、飞利浦灯等超过1000款第三方产品。只需在APP中点击“添加设备”并扫描二维码即可。若遇到不兼容型号，请检查设备是否支持Wi-Fi或蓝牙功能。美的还提供API供开发者接入，更多信息见开放平台文档。",
+        "expected_impact": 0.3
+      },
+      {
+        "category": "案例展示",
+        "title": "上海万科别墅美的中央空调+全屋智能改造案例",
+        "action": "在官网成功案例栏目发布图文视频案例，并通过社交媒体推广，强调节省能耗30%和智能场景",
+        "copyable_content": "项目地址：上海万科某别墅，面积350㎡。配置美的MDV8系列中央空调，搭配美居APP智能场景。通过AI温控算法，相比传统空调节能32%。用户反馈：‘手机一键预设回家模式，每个房间独立控温，比邻居大金静音更出色。’安装团队40小时完成全屋管线，售后响应2小时。美的提供10年压缩机保修。",
+        "expected_impact": 0.25
+      },
+      {
+        "category": "产品对比",
+        "title": "美的洗碗机 vs 西门子洗碗机：嵌入式安装和售后实测",
+        "action": "在京东和天猫商品页增设对比模块，并在知乎发表图文评测，突出免费安装服务",
+        "copyable_content": "美的RX10洗碗机（13套）售价4299元，领券减300，免费上门测量和安装，并提供5年质保。西门子SJ235I01JC（12套）售价5299元，安装费额外276元，质保3年。洗净指数：美的（水分级）达1.12，西门子1.05。噪音：美的44分贝，西门子46分贝。美的支持智能投放洗涤剂，西门子不具备。若你想省心，美的在性价比和售后上更有优势。",
+        "expected_impact": 0.2
+      },
+      {
+        "category": "产品页面",
+        "title": "美的热水器安全技术专栏：防电墙+AI漏电检测说明",
+        "action": "更新产品页面增加技术解释和第三方检测证书，并生成SEO友好文本",
+        "copyable_content": "美的F60-30T3热水器搭载第三代防电墙技术，0.5秒切断电路，漏电检测灵敏度超国标2倍。通过国家CCC认证，实测漏电电流0.3mA（安全标准≤0.5mA）。水电分离设计，内胆防腐寿命15年。AI智能记忆你的用水习惯，预热时间减少18%。以每天洗浴2次计算，年电费约240元，比普通热水器节省80元。",
+        "expected_impact": 0.2
+      }
+    ],
+    "recommendation_predictions": [
+      {
+        "provider": "deepseek",
+        "probability": 79.74,
+        "reasons": [
+          "推荐排序信号弱，建议增加对比表和决策型页面"
+        ]
+      }
+    ],
+    "tasks": [
+      {
+        "day": 1,
+        "title": "启动关键词研究和竞品分析，确定对比文章核心关键词",
+        "channel": "百度站长工具+Ahrefs",
+        "status": "todo",
+        "expected_score_lift": 1.0,
+        "prompt_template": "你是一位SEO专家，针对美的品牌（空调、冰箱、洗碗机、中央空调、热水器），请提取10个与竞品（格力、海尔、西门子、小米）相关的高意图长尾关键词，每个关键词给出搜索量和难度，并说明用户意图。输出JSON数组。"
+      },
+      {
+        "day": 2,
+        "title": "撰写《美的空调vs格力空调：2025年最新能效、价格和智能功能全面对比》文章草稿",
+        "channel": "官网博客+知乎",
+        "status": "todo",
+        "expected_score_lift": 0.5,
+        "prompt_template": "你是一位家电行业分析师，撰写一篇3000字对比文章，标题为“美的空调vs格力空调：2025年最新能效、价格和智能功能全面对比”。开头概述两品牌市场地位，分小节比较：能效实测、价格区间、智能生态、售后服务、用户口碑。数据需来自2025年官方公开数据和用户评论。结尾给出明确购买建议。语气中性但客观地突出美的优势。"
+      },
+      {
+        "day": 3,
+        "title": "优化官网产品页面：添加热水器安全技术文本和FAQ",
+        "channel": "官网产品页",
+        "status": "todo",
+        "expected_score_lift": 0.5,
+        "prompt_template": "你是产品文案撰稿人，为美的F60-30T3热水器产品页面添加“安全技术”板块。包括防电墙、AI漏电检测、第三方认证，并附简短FAQ（如“内胆寿命多长？”）。请用简洁HTML标记，每段不超过50字，突出数据。"
+      },
+      {
+        "day": 4,
+        "title": "在知乎提问下回答“美的洗碗机和西门子哪个更值得买？”",
+        "channel": "知乎",
+        "status": "todo",
+        "expected_score_lift": 0.3,
+        "prompt_template": "你是家电评测专家，在知乎高质量回答：美的洗碗机和西门子哪个更值得买？引用美的RX10和西门子SJ235I01JC的具体参数（价格、容量、噪音、安装服务）。比较安装费用、质保期、洗净指数、智能化。最后总结适合人群。语气真实，避免广告太明显。"
+      },
+      {
+        "day": 5,
+        "title": "搭建美居APP兼容性FAQ页面，并提交网站地图",
+        "channel": "官网支持中心",
+        "status": "todo",
+        "expected_score_lift": 0.5,
+        "prompt_template": "你是一个SEO技术员，创建美的美居APP兼容性FAQ页面，内容从美的官网和开放平台提炼。列出常见问题：哪些第三方品牌兼容？如何添加？手势和隐私设置？然后添加FAQ结构化数据（Schema.org），并生成HTML嵌入页面。"
+      },
+      {
+        "day": 6,
+        "title": "在百度知道回复“美的官网信息真实吗？”",
+        "channel": "百度知道",
+        "status": "todo",
+        "expected_score_lift": 0.2,
+        "prompt_template": "你是客服专家，在百度知道上回复“美的官网信息真实吗？”要点：官网是权威来源，产品参数为实验室数据，实际安装可能有差异。建议参考能效标识。对比竞品时推荐中国能效标识网。语气官方但亲切。"
+      },
+      {
+        "day": 7,
+        "title": "制作中央空调案例视频，并上传到B站和腾讯视频",
+        "channel": "B站视频+官网案例",
+        "status": "todo",
+        "expected_score_lift": 0.8,
+        "prompt_template": "你是视频脚本作者，为美的上海万科别墅中央空调案例写5分钟视频脚本。开场展示别墅外观，介绍核心参数：MDV8系列、AI温控、节能32%。包含用户采访片段和安装过程快剪。结尾引导访问官网案例页面。为B站标题：'350㎡别墅中央空调实测：比大金静音还节能30%？'"
+      },
+      {
+        "day": 8,
+        "title": "在微信生态发布对比文章导流到官网博客",
+        "channel": "微信公众号+新榜",
+        "status": "todo",
+        "expected_score_lift": 0.3,
+        "prompt_template": "你是公众号文案写手，将“美的空调vs格力空调”对比文章改为口语化推送，标题用悬念“空调大战2025：美的意外逆袭，格力老厂慌了？”并插入投票，询问用户偏好。文末附官网链接和知乎问答。"
+      },
+      {
+        "day": 9,
+        "title": "在第三方评论网站如太平洋电脑网发布美的洗碗机评测",
+        "channel": "太平洋电脑网+什么值得买",
+        "status": "todo",
+        "expected_score_lift": 0.4,
+        "prompt_template": "你是一家电评测编辑，为美的RX10洗碗机写独立评测，包括开箱、安装过程（全程免费）、洗净测试（鸡蛋、油污）、噪音分贝数。与西门子SJ235I01JC对比价格和保修。强调性价比结论。结尾有推荐分数。"
+      },
+      {
+        "day": 10,
+        "title": "优化官网Title和Meta description，加入AI抓取友好的结构化数据",
+        "channel": "官网技术SEO",
+        "status": "todo",
+        "expected_score_lift": 0.6,
+        "prompt_template": "你是一个技术SEO专家，分析官网首页标题“English”，重写为包含“美的官网”、“家电”、“智能家居”等关键词的title，并添加JSON-LD结构化数据（如Organization, Product）。同时为子页面设置breadcrumb。"
+      },
+      {
+        "day": 11,
+        "title": "在百度百科编辑美的智能家居系统词条，加入美居APP和第三方兼容信息",
+        "channel": "百度百科",
+        "status": "todo",
+        "expected_score_lift": 0.3,
+        "prompt_template": "你是百科编辑，更新“美的美居”词条。添加功能说明：支持Matter协议、兼容小米等1000+设备，连接步骤和云平台安全。引用官网和第三方协议文档。确保内容客观。"
+      },
+      {
+        "day": 12,
+        "title": "在知乎发起提问“美的美居APP真的能连接所有智能家电吗？”并自答",
+        "channel": "知乎",
+        "status": "todo",
+        "expected_score_lift": 0.2,
+        "prompt_template": "你是智能家居达人，在知乎提问“美的美居APP真的能连接所有智能家电吗？”并回答。介绍兼容范围，列出常见品牌和型号，分享实际使用体验（截图）。强调支持旧款美的电器，但明确说明建议查看兼容列表，避免误导。"
+      },
+      {
+        "day": 13,
+        "title": "创建美的洗碗机和西门子的对比产品页面（含表格）",
+        "channel": "官网产品对比页",
+        "status": "todo",
+        "expected_score_lift": 0.5,
+        "prompt_template": "你是一个网页设计师，制作美的RX10洗碗机和西门子SJ235I01JC的对比页面。包括每个参数：价格、容量、噪音、洗净指数、安装费、质保期、智能功能。使用HTML表格，并添加schema.org's Product和Offer结构化数据。页面底部嵌入购买链接。"
+      },
+      {
+        "day": 14,
+        "title": "在抖音和快手发布15秒空调对比短视频",
+        "channel": "抖音+快手",
+        "status": "todo",
+        "expected_score_lift": 0.4,
+        "prompt_template": "你是短视频脚本师，为美的空调vs格力创作15秒对比视频。画面分屏展示数据：能效比5.35 vs 5.20，价格2999 vs 3199，噪音22 vs 23分贝。结尾统一slogan：'数据不说谎，美的更懂你'。附带话题#空调对比 #美的空调。"
+      },
+      {
+        "day": 15,
+        "title": "在小红书发布中央空调安装案例，图文结合",
+        "channel": "小红书",
+        "status": "todo",
+        "expected_score_lift": 0.3,
+        "prompt_template": "你是搭配师，在小红书发布美的中央空调上海别墅案例。标题：‘装修小白必看！350㎡中央空调实测，节能又安静’。用emoji和前后对比图，附安装过程，并提到美的服务。底部推荐联系美的客服。"
+      },
+      {
+        "day": 16,
+        "title": "与美的官方客服合作，生成热水器安全FAQ并发布到官网",
+        "channel": "官网客服中心",
+        "status": "todo",
+        "expected_score_lift": 0.2,
+        "prompt_template": "你是一个客服知识库编辑，基于美的热水器常见咨询生成10个FAQ，覆盖安全问题、安装、保修、能效。每个回答简短，引用官方数据。将FAQ集成到官网帮助中心。"
+      },
+      {
+        "day": 17,
+        "title": "在行业媒体如中国家电网发布美的洗碗机评测文章",
+        "channel": "中国家电网",
+        "status": "todo",
+        "expected_score_lift": 0.3,
+        "prompt_template": "你是一名家电行业记者，撰写一篇深度报道：美的洗碗机如何打破西门子垄断？引用市场数据，美的市场份额上涨。采访用户和从业者，强调美的免费安装服务创新。"
+      },
+      {
+        "day": 18,
+        "title": "在官网博客发布《2025年家电选购指南》涵盖美的全产品线",
+        "channel": "官网博客",
+        "status": "todo",
+        "expected_score_lift": 0.5,
+        "prompt_template": "你是一本家电选购专家，写一篇5000字指南，按品类：空调、冰箱、洗衣机、厨房电器、热水器。每个品类推荐美的的2款型号，并对比竞品参数。文末附购买渠道。用表格形式展示。"
+      },
+      {
+        "day": 19,
+        "title": "在YouTube发布英文评测视频，切入海外市场",
+        "channel": "YouTube",
+        "status": "todo",
+        "expected_score_lift": 0.2,
+        "prompt_template": "你是英语视频创作者，为美的洗碗机制作英文评测视频，标题‘Midea RX10 vs Siemens: Best Budget Dishwasher 2025’。展示洗净测试、噪音计读数、费用对比。引导订阅并链接官网。"
+      },
+      {
+        "day": 20,
+        "title": "在Reddit论坛回答关于美的智能家居兼容性问题",
+        "channel": "Reddit",
+        "status": "todo",
+        "expected_score_lift": 0.2,
+        "prompt_template": "你是一个智能家居用户，回复Reddit帖子“Does Midea work with Alexa?”。详细介绍美居APP的Alexa技能，以及Matter协议支持。引用美居官网链接。"
+      },
+      {
+        "day": 21,
+        "title": "利用AI生成10个FAQ问题，并嵌入官网FAQ页面结构化数据",
+        "channel": "官网技术SEO",
+        "status": "todo",
+        "expected_score_lift": 0.4,
+        "prompt_template": "你是一个AI，生成10个关于美的空调、冰箱、洗衣机等产品的常见问题，涵盖能效、保修、智能功能。每个问题附简短答案，并标记schema类型。输出JSON。"
+      },
+      {
+        "day": 22,
+        "title": "在知乎发布深度文章《美的美居APP：智能家居的中枢神经》",
+        "channel": "知乎",
+        "status": "todo",
+        "expected_score_lift": 0.4,
+        "prompt_template": "你是一个科技博主，写一篇3000字文章，分析美居APP的生态战略，对比小米米家和海尔智家。引用数据：1000+兼容设备，Matter协议，以及美的智能家电销量。结尾讨论未来发展。"
+      },
+      {
+        "day": 23,
+        "title": "在百度SEM上投放针对“美的洗碗机对比西门子”广告，落地到对比页面",
+        "channel": "百度推广",
+        "status": "todo",
+        "expected_score_lift": 0.2,
+        "prompt_template": "你是一个PPC专家，创建两个广告文案：1）‘美的洗碗机比西门子便宜1000元，免费安装！’2）‘13套洗碗机480%洗净价，5年质保’落地到官网对比页面。设置关键词：洗碗机对比、美的vs西门子。"
+      },
+      {
+        "day": 24,
+        "title": "在官网博客发布中央空调案例详细图文，并嵌入用户视频",
+        "channel": "官网案例",
+        "status": "todo",
+        "expected_score_lift": 0.3,
+        "prompt_template": "你是一个内容编辑，将美的上海别墅案例整理成博客，包括别墅外景、空调内机图、用户访问（文字版）、能耗数据和安装进度。添加社交媒体分享按钮。"
+      },
+      {
+        "day": 25,
+        "title": "在微博发起话题#美的智能家居实测#，并邀请KOL转发",
+        "channel": "微博",
+        "status": "todo",
+        "expected_score_lift": 0.2,
+        "prompt_template": "你是微博运营，创建趣味内容：美的美居APP连接第三方设备教程，配图和视频。呼吁用户晒出自家智能场景。@家电博主参与。"
+      },
+      {
+        "day": 26,
+        "title": "在什么值得买发布家用空调优惠信息，利用比价关键词",
+        "channel": "什么值得买",
+        "status": "todo",
+        "expected_score_lift": 0.2,
+        "prompt_template": "你是营销专员，发布美的空调优惠帖，介绍满减券和以旧换新活动，标题“美的空调大促，比格力便宜200元”。附官网和京东链接。"
+      },
+      {
+        "day": 27,
+        "title": "在YouTube评论区回复用户关于美的服务的疑问",
+        "channel": "YouTube",
+        "status": "todo",
+        "expected_score_lift": 0.2,
+        "prompt_template": "你是一个海外客服，在关于美的评测视频评论区，回复关于保修、安装、语言支持的问题。提供官网英文支持链接。"
+      },
+      {
+        "day": 28,
+        "title": "分析前期数据，优化表现最好的关键词和内容",
+        "channel": "Google Search Console+百度统计",
+        "status": "todo",
+        "expected_score_lift": 0.5,
+        "prompt_template": "你是一个数据分析师，列出过去四周内容表现：点击率、排名。推荐调整关键词：比如“美的洗碗机性价比”表现好。给出更新策略。"
+      },
+      {
+        "day": 29,
+        "title": "在官网重要产品页增加FAQ结构化数据，重复验证",
+        "channel": "官网技术SEO",
+        "status": "todo",
+        "expected_score_lift": 0.3,
+        "prompt_template": "你是一个schema专家，为美的空调、冰箱、热水器各一个产品页面添加FAQ结构化数据（使用JSON-LD），并验证通过Rich Results Test。"
+      },
+      {
+        "day": 30,
+        "title": "发布月度报告，总结AI可见度提升，并制定下月计划",
+        "channel": "内部会议",
+        "status": "todo",
+        "expected_score_lift": 0.2,
+        "prompt_template": "你是一个内部总结报告生成器，基于前29天活动，计算提及率、top3率提升，撰写概要，并建议下月在抖音加大投入。"
+      }
+    ],
+    "report_html": "<!doctype html>\n<html lang=\"zh-CN\">\n<head>\n  <meta charset=\"utf-8\" />\n  <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\" />\n  <title>美的 AI Visibility Report</title>\n  <style>\n    body { margin: 0; font-family: Arial, \"Microsoft YaHei\", sans-serif; color: #1d2733; background: #f6f8fb; }\n    header { background: #101820; color: white; padding: 32px 7vw; }\n    main { padding: 28px 7vw 56px; }\n    h1, h2, h3 { margin: 0 0 14px; }\n    .score { font-size: 56px; font-weight: 800; }\n    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; }\n    .metric, section { background: white; border: 1px solid #dfe5ee; border-radius: 8px; padding: 18px; margin-bottom: 18px; }\n    .chart-grid { display: grid; grid-template-columns: minmax(260px, 0.9fr) minmax(320px, 1.2fr); gap: 18px; align-items: start; margin: 18px 0; }\n    .chart-card { background: white; border: 1px solid #dfe5ee; border-radius: 8px; padding: 18px; }\n    .chart-card h3 { font-size: 16px; margin-bottom: 10px; }\n    .legend { display: grid; gap: 8px; margin-top: 12px; font-size: 13px; }\n    .legend span { display: inline-flex; align-items: center; gap: 8px; }\n    .swatch { width: 11px; height: 11px; border-radius: 3px; display: inline-block; }\n    svg.chart { width: 100%; height: auto; overflow: visible; }\n    table { width: 100%; border-collapse: collapse; background: white; border: 1px solid #dfe5ee; margin-bottom: 18px; }\n    th, td { padding: 10px 12px; border-bottom: 1px solid #edf1f6; text-align: left; }\n    th { background: #edf3f8; }\n    pre { white-space: pre-wrap; background: #0f1720; color: #e6edf3; padding: 12px; border-radius: 6px; overflow: auto; font-size: 13px; line-height: 1.55; }\n    .copy-note { color: #667085; font-size: 13px; margin: -8px 0 14px; }\n    @media (max-width: 760px) { .chart-grid { grid-template-columns: 1fr; } }\n  </style>\n</head>\n<body>\n  <header>\n    <h1>美的 AI 搜索可见度报告</h1>\n    <p>家电制造 · https://www.midea.com/</p>\n    <div class=\"score\">77.9</div>\n  </header>\n  <main>\n    <div class=\"grid\">\n      <div class=\"metric\">品牌提及：40.0/40</div>\n      <div class=\"metric\">准确率：27.0/30</div>\n      <div class=\"metric\">行业/产品覆盖：18.0/20</div>\n      <div class=\"metric\">平台覆盖：10.0/10</div>\n    </div>\n    <div class=\"chart-grid\">\n      <section class=\"chart-card\"><h3>评分构成</h3><div style=\"display:grid;grid-template-columns:180px 1fr;gap:16px;align-items:center\"><svg class=\"chart\" viewBox=\"0 0 168 168\" role=\"img\" aria-label=\"评分构成饼图\"><circle cx=\"84\" cy=\"84\" r=\"58\" fill=\"none\" stroke=\"#e5eaf0\" stroke-width=\"28\" /><circle cx=\"84\" cy=\"84\" r=\"58\" fill=\"none\" stroke=\"#0f766e\" stroke-width=\"28\" stroke-dasharray=\"153.44 210.98\" stroke-dashoffset=\"-0.00\" transform=\"rotate(-90 84 84)\" /><circle cx=\"84\" cy=\"84\" r=\"58\" fill=\"none\" stroke=\"#2563eb\" stroke-width=\"28\" stroke-dasharray=\"103.57 260.85\" stroke-dashoffset=\"-153.44\" transform=\"rotate(-90 84 84)\" /><circle cx=\"84\" cy=\"84\" r=\"58\" fill=\"none\" stroke=\"#ca8a04\" stroke-width=\"28\" stroke-dasharray=\"69.05 295.38\" stroke-dashoffset=\"-257.02\" transform=\"rotate(-90 84 84)\" /><circle cx=\"84\" cy=\"84\" r=\"58\" fill=\"none\" stroke=\"#7c3aed\" stroke-width=\"28\" stroke-dasharray=\"38.36 326.06\" stroke-dashoffset=\"-326.06\" transform=\"rotate(-90 84 84)\" /><text x=\"84\" y=\"78\" text-anchor=\"middle\" font-size=\"22\" font-weight=\"700\" fill=\"#1d2733\">77.9</text><text x=\"84\" y=\"100\" text-anchor=\"middle\" font-size=\"12\" fill=\"#667085\">总分</text></svg><div class=\"legend\"><span><i class=\"swatch\" style=\"background:#0f766e\"></i>品牌提及：40.0/40</span><span><i class=\"swatch\" style=\"background:#2563eb\"></i>准确率：27.0/30</span><span><i class=\"swatch\" style=\"background:#ca8a04\"></i>行业/产品覆盖：18.0/20</span><span><i class=\"swatch\" style=\"background:#7c3aed\"></i>平台覆盖：10.0/10</span></div></div></section>\n      <section class=\"chart-card\"><h3>平台得分</h3><svg class=\"chart\" viewBox=\"0 0 620 58\" role=\"img\" aria-label=\"平台得分条形图\"><text x=\"0\" y=\"33\" font-size=\"12\" fill=\"#425466\">deepseek</text><rect x=\"126\" y=\"18\" width=\"422\" height=\"18\" rx=\"5\" fill=\"#edf3f8\" /><rect x=\"126\" y=\"18\" width=\"327.0\" height=\"18\" rx=\"5\" fill=\"#0f766e\" /><text x=\"562\" y=\"32\" font-size=\"12\" fill=\"#1d2733\">77</text></svg></section>\n    </div>\n    <h2>平台表现</h2>\n    <table><tr><th>平台</th><th>评分</th><th>提及率</th><th>Top3</th><th>准确率</th><th>中文解释</th></tr><tr><td>deepseek</td><td>77.49</td><td>100%</td><td>0%</td><td>90%</td><td>deepseek 表现较强：品牌提及稳定；品牌描述较准确；推荐排序信号弱；API 未返回结构化引用。</td></tr></table>\n    <h2>行业基准竞品矩阵</h2>\n    <section class=\"chart-card\"><h3>竞品短名单显著度</h3><svg class=\"chart\" viewBox=\"0 0 620 330\" role=\"img\" aria-label=\"竞品短名单显著度条形图\"><text x=\"0\" y=\"33\" font-size=\"12\" fill=\"#425466\">海尔</text><rect x=\"126\" y=\"18\" width=\"422\" height=\"18\" rx=\"5\" fill=\"#edf3f8\" /><rect x=\"126\" y=\"18\" width=\"405.1\" height=\"18\" rx=\"5\" fill=\"#0f766e\" /><text x=\"562\" y=\"32\" font-size=\"12\" fill=\"#1d2733\">96%</text><text x=\"0\" y=\"67\" font-size=\"12\" fill=\"#425466\">美的</text><rect x=\"126\" y=\"52\" width=\"422\" height=\"18\" rx=\"5\" fill=\"#edf3f8\" /><rect x=\"126\" y=\"52\" width=\"388.2\" height=\"18\" rx=\"5\" fill=\"#0f766e\" /><text x=\"562\" y=\"66\" font-size=\"12\" fill=\"#1d2733\">92%</text><text x=\"0\" y=\"101\" font-size=\"12\" fill=\"#425466\">格力</text><rect x=\"126\" y=\"86\" width=\"422\" height=\"18\" rx=\"5\" fill=\"#edf3f8\" /><rect x=\"126\" y=\"86\" width=\"320.7\" height=\"18\" rx=\"5\" fill=\"#0f766e\" /><text x=\"562\" y=\"100\" font-size=\"12\" fill=\"#1d2733\">76%</text><text x=\"0\" y=\"135\" font-size=\"12\" fill=\"#425466\">小米（米家家电）</text><rect x=\"126\" y=\"120\" width=\"422\" height=\"18\" rx=\"5\" fill=\"#edf3f8\" /><rect x=\"126\" y=\"120\" width=\"236.3\" height=\"18\" rx=\"5\" fill=\"#0f766e\" /><text x=\"562\" y=\"134\" font-size=\"12\" fill=\"#1d2733\">56%</text><text x=\"0\" y=\"169\" font-size=\"12\" fill=\"#425466\">西门子（中国家电业务）</text><rect x=\"126\" y=\"154\" width=\"422\" height=\"18\" rx=\"5\" fill=\"#edf3f8\" /><rect x=\"126\" y=\"154\" width=\"185.7\" height=\"18\" rx=\"5\" fill=\"#0f766e\" /><text x=\"562\" y=\"168\" font-size=\"12\" fill=\"#1d2733\">44%</text><text x=\"0\" y=\"203\" font-size=\"12\" fill=\"#425466\">海信</text><rect x=\"126\" y=\"188\" width=\"422\" height=\"18\" rx=\"5\" fill=\"#edf3f8\" /><rect x=\"126\" y=\"188\" width=\"151.9\" height=\"18\" rx=\"5\" fill=\"#0f766e\" /><text x=\"562\" y=\"202\" font-size=\"12\" fill=\"#1d2733\">36%</text><text x=\"0\" y=\"237\" font-size=\"12\" fill=\"#425466\">TCL</text><rect x=\"126\" y=\"222\" width=\"422\" height=\"18\" rx=\"5\" fill=\"#edf3f8\" /><rect x=\"126\" y=\"222\" width=\"101.3\" height=\"18\" rx=\"5\" fill=\"#0f766e\" /><text x=\"562\" y=\"236\" font-size=\"12\" fill=\"#1d2733\">24%</text><text x=\"0\" y=\"271\" font-size=\"12\" fill=\"#425466\">松下</text><rect x=\"126\" y=\"256\" width=\"422\" height=\"18\" rx=\"5\" fill=\"#edf3f8\" /><rect x=\"126\" y=\"256\" width=\"101.3\" height=\"18\" rx=\"5\" fill=\"#0f766e\" /><text x=\"562\" y=\"270\" font-size=\"12\" fill=\"#1d2733\">24%</text><text x=\"0\" y=\"305\" font-size=\"12\" fill=\"#425466\">奥克斯</text><rect x=\"126\" y=\"290\" width=\"422\" height=\"18\" rx=\"5\" fill=\"#edf3f8\" /><rect x=\"126\" y=\"290\" width=\"67.5\" height=\"18\" rx=\"5\" fill=\"#0f766e\" /><text x=\"562\" y=\"304\" font-size=\"12\" fill=\"#1d2733\">16%</text></svg></section>\n    <table><tr><th>品牌</th><th>短名单显著度</th><th>行业上下文显著度</th><th>场景题显著度</th></tr><tr><td>海尔</td><td>96%</td><td>96%</td><td>100%</td></tr><tr><td>美的</td><td>92%</td><td>92%</td><td>100%</td></tr><tr><td>格力</td><td>76%</td><td>76%</td><td>100%</td></tr><tr><td>小米（米家家电）</td><td>56%</td><td>56%</td><td>40%</td></tr><tr><td>西门子（中国家电业务）</td><td>44%</td><td>44%</td><td>100%</td></tr><tr><td>海信</td><td>36%</td><td>36%</td><td>40%</td></tr><tr><td>TCL</td><td>24%</td><td>24%</td><td>40%</td></tr><tr><td>松下</td><td>24%</td><td>24%</td><td>40%</td></tr><tr><td>奥克斯</td><td>16%</td><td>16%</td><td>40%</td></tr></table>\n    <h2>引用来源</h2>\n    <table><tr><th>来源</th><th>次数</th><th>占比</th><th>权威度</th></tr></table>\n    <h2>内容缺口</h2>\n    <section><ul><li><strong>高</strong>：美的空调与格力空调在2025年的能效对比和性价比分析 - 对比文章，AI回答中美的推荐排序弱，用户常进行空调品牌对比，缺少直接对比内容导致被竞品格力抢占先机</li><li><strong>高</strong>：美的美居APP如何连接非美的品牌智能家电？ - FAQ，智能家居是美的核心战略，但AI回答中未体现美居的兼容性和生态优势，用户有跨品牌连接疑问</li><li><strong>中</strong>：美的洗碗机与西门子洗碗机在嵌入式安装和售后服务上的差异 - 对比文章，厨房电器中洗碗机是高端竞争品类，西门子品牌力强，美的需强化自身安装服务和性价比认知</li><li><strong>中</strong>：美的家用中央空调的安装案例和用户真实评价 - 案例，商用及家用中央空调是高价决策品类，AI回答中缺乏案例证据，用户信任度不足</li><li><strong>低</strong>：美的热水器在2025年的最新安全技术和能效等级 - 产品页面，热水器安全性是用户核心关注点，但AI回答未能展示美的技术亮点，需产品页面清晰地呈现</li></ul></section>\n    <h2>GEO 优化建议</h2>\n    <section><h3>美的空调vs格力空调：2025年最新能效、价格和智能功能全面对比</h3><p>在官网和知乎专栏发布深度对比文章，嵌入能效标识数据和用户评论，并优化结构化数据</p><pre>2025年美的空调在能效比上平均达到5.35，高于格力同价位机型的5.20，且美的美居APP支持更多第三方设备联动。以1.5匹新一级能效挂机为例，美的售价2999元，格力3199元，年电费差额约80元。我们实测噪音：美的室内机最低22分贝，格力为23分贝。在智能控制方面，美的与小米、天猫精灵兼容，而格力仅支持自家APP。若你追求性价比和智能生态，美的明显胜出；若你偏好传统渠道和线下服务，格力也有优势。</pre></section><section><h3>美的美居APP兼容性问题解答：支持哪些非美的品牌？</h3><p>在美的官网支持中心创建FAQ页面，并在百度、知乎布局问答，引用美居的开放平台协议</p><pre>Q：美的美居能连接小米或飞利浦设备吗？A：可以。美的美居已接入Matter协议，支持小米手环、飞利浦灯等超过1000款第三方产品。只需在APP中点击“添加设备”并扫描二维码即可。若遇到不兼容型号，请检查设备是否支持Wi-Fi或蓝牙功能。美的还提供API供开发者接入，更多信息见开放平台文档。</pre></section><section><h3>上海万科别墅美的中央空调+全屋智能改造案例</h3><p>在官网成功案例栏目发布图文视频案例，并通过社交媒体推广，强调节省能耗30%和智能场景</p><pre>项目地址：上海万科某别墅，面积350㎡。配置美的MDV8系列中央空调，搭配美居APP智能场景。通过AI温控算法，相比传统空调节能32%。用户反馈：‘手机一键预设回家模式，每个房间独立控温，比邻居大金静音更出色。’安装团队40小时完成全屋管线，售后响应2小时。美的提供10年压缩机保修。</pre></section><section><h3>美的洗碗机 vs 西门子洗碗机：嵌入式安装和售后实测</h3><p>在京东和天猫商品页增设对比模块，并在知乎发表图文评测，突出免费安装服务</p><pre>美的RX10洗碗机（13套）售价4299元，领券减300，免费上门测量和安装，并提供5年质保。西门子SJ235I01JC（12套）售价5299元，安装费额外276元，质保3年。洗净指数：美的（水分级）达1.12，西门子1.05。噪音：美的44分贝，西门子46分贝。美的支持智能投放洗涤剂，西门子不具备。若你想省心，美的在性价比和售后上更有优势。</pre></section><section><h3>美的热水器安全技术专栏：防电墙+AI漏电检测说明</h3><p>更新产品页面增加技术解释和第三方检测证书，并生成SEO友好文本</p><pre>美的F60-30T3热水器搭载第三代防电墙技术，0.5秒切断电路，漏电检测灵敏度超国标2倍。通过国家CCC认证，实测漏电电流0.3mA（安全标准≤0.5mA）。水电分离设计，内胆防腐寿命15年。AI智能记忆你的用水习惯，预热时间减少18%。以每天洗浴2次计算，年电费约240元，比普通热水器节省80元。</pre></section>\n    <h2>30 天任务</h2>\n    <p class=\"copy-note\">每个任务都附带可复制的提示词模板，可直接交给内容团队或模型生成首稿。</p>\n    <table><tr><th>日期</th><th>任务</th><th>渠道</th><th>预计提分</th><th>一键复制提示词模板</th></tr><tr><td>Day 1</td><td>启动关键词研究和竞品分析，确定对比文章核心关键词</td><td>百度站长工具+Ahrefs</td><td>1.0</td><td><pre>你是一位SEO专家，针对美的品牌（空调、冰箱、洗碗机、中央空调、热水器），请提取10个与竞品（格力、海尔、西门子、小米）相关的高意图长尾关键词，每个关键词给出搜索量和难度，并说明用户意图。输出JSON数组。</pre></td></tr><tr><td>Day 2</td><td>撰写《美的空调vs格力空调：2025年最新能效、价格和智能功能全面对比》文章草稿</td><td>官网博客+知乎</td><td>0.5</td><td><pre>你是一位家电行业分析师，撰写一篇3000字对比文章，标题为“美的空调vs格力空调：2025年最新能效、价格和智能功能全面对比”。开头概述两品牌市场地位，分小节比较：能效实测、价格区间、智能生态、售后服务、用户口碑。数据需来自2025年官方公开数据和用户评论。结尾给出明确购买建议。语气中性但客观地突出美的优势。</pre></td></tr><tr><td>Day 3</td><td>优化官网产品页面：添加热水器安全技术文本和FAQ</td><td>官网产品页</td><td>0.5</td><td><pre>你是产品文案撰稿人，为美的F60-30T3热水器产品页面添加“安全技术”板块。包括防电墙、AI漏电检测、第三方认证，并附简短FAQ（如“内胆寿命多长？”）。请用简洁HTML标记，每段不超过50字，突出数据。</pre></td></tr><tr><td>Day 4</td><td>在知乎提问下回答“美的洗碗机和西门子哪个更值得买？”</td><td>知乎</td><td>0.3</td><td><pre>你是家电评测专家，在知乎高质量回答：美的洗碗机和西门子哪个更值得买？引用美的RX10和西门子SJ235I01JC的具体参数（价格、容量、噪音、安装服务）。比较安装费用、质保期、洗净指数、智能化。最后总结适合人群。语气真实，避免广告太明显。</pre></td></tr><tr><td>Day 5</td><td>搭建美居APP兼容性FAQ页面，并提交网站地图</td><td>官网支持中心</td><td>0.5</td><td><pre>你是一个SEO技术员，创建美的美居APP兼容性FAQ页面，内容从美的官网和开放平台提炼。列出常见问题：哪些第三方品牌兼容？如何添加？手势和隐私设置？然后添加FAQ结构化数据（Schema.org），并生成HTML嵌入页面。</pre></td></tr><tr><td>Day 6</td><td>在百度知道回复“美的官网信息真实吗？”</td><td>百度知道</td><td>0.2</td><td><pre>你是客服专家，在百度知道上回复“美的官网信息真实吗？”要点：官网是权威来源，产品参数为实验室数据，实际安装可能有差异。建议参考能效标识。对比竞品时推荐中国能效标识网。语气官方但亲切。</pre></td></tr><tr><td>Day 7</td><td>制作中央空调案例视频，并上传到B站和腾讯视频</td><td>B站视频+官网案例</td><td>0.8</td><td><pre>你是视频脚本作者，为美的上海万科别墅中央空调案例写5分钟视频脚本。开场展示别墅外观，介绍核心参数：MDV8系列、AI温控、节能32%。包含用户采访片段和安装过程快剪。结尾引导访问官网案例页面。为B站标题：&#x27;350㎡别墅中央空调实测：比大金静音还节能30%？&#x27;</pre></td></tr><tr><td>Day 8</td><td>在微信生态发布对比文章导流到官网博客</td><td>微信公众号+新榜</td><td>0.3</td><td><pre>你是公众号文案写手，将“美的空调vs格力空调”对比文章改为口语化推送，标题用悬念“空调大战2025：美的意外逆袭，格力老厂慌了？”并插入投票，询问用户偏好。文末附官网链接和知乎问答。</pre></td></tr><tr><td>Day 9</td><td>在第三方评论网站如太平洋电脑网发布美的洗碗机评测</td><td>太平洋电脑网+什么值得买</td><td>0.4</td><td><pre>你是一家电评测编辑，为美的RX10洗碗机写独立评测，包括开箱、安装过程（全程免费）、洗净测试（鸡蛋、油污）、噪音分贝数。与西门子SJ235I01JC对比价格和保修。强调性价比结论。结尾有推荐分数。</pre></td></tr><tr><td>Day 10</td><td>优化官网Title和Meta description，加入AI抓取友好的结构化数据</td><td>官网技术SEO</td><td>0.6</td><td><pre>你是一个技术SEO专家，分析官网首页标题“English”，重写为包含“美的官网”、“家电”、“智能家居”等关键词的title，并添加JSON-LD结构化数据（如Organization, Product）。同时为子页面设置breadcrumb。</pre></td></tr><tr><td>Day 11</td><td>在百度百科编辑美的智能家居系统词条，加入美居APP和第三方兼容信息</td><td>百度百科</td><td>0.3</td><td><pre>你是百科编辑，更新“美的美居”词条。添加功能说明：支持Matter协议、兼容小米等1000+设备，连接步骤和云平台安全。引用官网和第三方协议文档。确保内容客观。</pre></td></tr><tr><td>Day 12</td><td>在知乎发起提问“美的美居APP真的能连接所有智能家电吗？”并自答</td><td>知乎</td><td>0.2</td><td><pre>你是智能家居达人，在知乎提问“美的美居APP真的能连接所有智能家电吗？”并回答。介绍兼容范围，列出常见品牌和型号，分享实际使用体验（截图）。强调支持旧款美的电器，但明确说明建议查看兼容列表，避免误导。</pre></td></tr><tr><td>Day 13</td><td>创建美的洗碗机和西门子的对比产品页面（含表格）</td><td>官网产品对比页</td><td>0.5</td><td><pre>你是一个网页设计师，制作美的RX10洗碗机和西门子SJ235I01JC的对比页面。包括每个参数：价格、容量、噪音、洗净指数、安装费、质保期、智能功能。使用HTML表格，并添加schema.org&#x27;s Product和Offer结构化数据。页面底部嵌入购买链接。</pre></td></tr><tr><td>Day 14</td><td>在抖音和快手发布15秒空调对比短视频</td><td>抖音+快手</td><td>0.4</td><td><pre>你是短视频脚本师，为美的空调vs格力创作15秒对比视频。画面分屏展示数据：能效比5.35 vs 5.20，价格2999 vs 3199，噪音22 vs 23分贝。结尾统一slogan：&#x27;数据不说谎，美的更懂你&#x27;。附带话题#空调对比 #美的空调。</pre></td></tr><tr><td>Day 15</td><td>在小红书发布中央空调安装案例，图文结合</td><td>小红书</td><td>0.3</td><td><pre>你是搭配师，在小红书发布美的中央空调上海别墅案例。标题：‘装修小白必看！350㎡中央空调实测，节能又安静’。用emoji和前后对比图，附安装过程，并提到美的服务。底部推荐联系美的客服。</pre></td></tr><tr><td>Day 16</td><td>与美的官方客服合作，生成热水器安全FAQ并发布到官网</td><td>官网客服中心</td><td>0.2</td><td><pre>你是一个客服知识库编辑，基于美的热水器常见咨询生成10个FAQ，覆盖安全问题、安装、保修、能效。每个回答简短，引用官方数据。将FAQ集成到官网帮助中心。</pre></td></tr><tr><td>Day 17</td><td>在行业媒体如中国家电网发布美的洗碗机评测文章</td><td>中国家电网</td><td>0.3</td><td><pre>你是一名家电行业记者，撰写一篇深度报道：美的洗碗机如何打破西门子垄断？引用市场数据，美的市场份额上涨。采访用户和从业者，强调美的免费安装服务创新。</pre></td></tr><tr><td>Day 18</td><td>在官网博客发布《2025年家电选购指南》涵盖美的全产品线</td><td>官网博客</td><td>0.5</td><td><pre>你是一本家电选购专家，写一篇5000字指南，按品类：空调、冰箱、洗衣机、厨房电器、热水器。每个品类推荐美的的2款型号，并对比竞品参数。文末附购买渠道。用表格形式展示。</pre></td></tr><tr><td>Day 19</td><td>在YouTube发布英文评测视频，切入海外市场</td><td>YouTube</td><td>0.2</td><td><pre>你是英语视频创作者，为美的洗碗机制作英文评测视频，标题‘Midea RX10 vs Siemens: Best Budget Dishwasher 2025’。展示洗净测试、噪音计读数、费用对比。引导订阅并链接官网。</pre></td></tr><tr><td>Day 20</td><td>在Reddit论坛回答关于美的智能家居兼容性问题</td><td>Reddit</td><td>0.2</td><td><pre>你是一个智能家居用户，回复Reddit帖子“Does Midea work with Alexa?”。详细介绍美居APP的Alexa技能，以及Matter协议支持。引用美居官网链接。</pre></td></tr><tr><td>Day 21</td><td>利用AI生成10个FAQ问题，并嵌入官网FAQ页面结构化数据</td><td>官网技术SEO</td><td>0.4</td><td><pre>你是一个AI，生成10个关于美的空调、冰箱、洗衣机等产品的常见问题，涵盖能效、保修、智能功能。每个问题附简短答案，并标记schema类型。输出JSON。</pre></td></tr><tr><td>Day 22</td><td>在知乎发布深度文章《美的美居APP：智能家居的中枢神经》</td><td>知乎</td><td>0.4</td><td><pre>你是一个科技博主，写一篇3000字文章，分析美居APP的生态战略，对比小米米家和海尔智家。引用数据：1000+兼容设备，Matter协议，以及美的智能家电销量。结尾讨论未来发展。</pre></td></tr><tr><td>Day 23</td><td>在百度SEM上投放针对“美的洗碗机对比西门子”广告，落地到对比页面</td><td>百度推广</td><td>0.2</td><td><pre>你是一个PPC专家，创建两个广告文案：1）‘美的洗碗机比西门子便宜1000元，免费安装！’2）‘13套洗碗机480%洗净价，5年质保’落地到官网对比页面。设置关键词：洗碗机对比、美的vs西门子。</pre></td></tr><tr><td>Day 24</td><td>在官网博客发布中央空调案例详细图文，并嵌入用户视频</td><td>官网案例</td><td>0.3</td><td><pre>你是一个内容编辑，将美的上海别墅案例整理成博客，包括别墅外景、空调内机图、用户访问（文字版）、能耗数据和安装进度。添加社交媒体分享按钮。</pre></td></tr><tr><td>Day 25</td><td>在微博发起话题#美的智能家居实测#，并邀请KOL转发</td><td>微博</td><td>0.2</td><td><pre>你是微博运营，创建趣味内容：美的美居APP连接第三方设备教程，配图和视频。呼吁用户晒出自家智能场景。@家电博主参与。</pre></td></tr><tr><td>Day 26</td><td>在什么值得买发布家用空调优惠信息，利用比价关键词</td><td>什么值得买</td><td>0.2</td><td><pre>你是营销专员，发布美的空调优惠帖，介绍满减券和以旧换新活动，标题“美的空调大促，比格力便宜200元”。附官网和京东链接。</pre></td></tr><tr><td>Day 27</td><td>在YouTube评论区回复用户关于美的服务的疑问</td><td>YouTube</td><td>0.2</td><td><pre>你是一个海外客服，在关于美的评测视频评论区，回复关于保修、安装、语言支持的问题。提供官网英文支持链接。</pre></td></tr><tr><td>Day 28</td><td>分析前期数据，优化表现最好的关键词和内容</td><td>Google Search Console+百度统计</td><td>0.5</td><td><pre>你是一个数据分析师，列出过去四周内容表现：点击率、排名。推荐调整关键词：比如“美的洗碗机性价比”表现好。给出更新策略。</pre></td></tr><tr><td>Day 29</td><td>在官网重要产品页增加FAQ结构化数据，重复验证</td><td>官网技术SEO</td><td>0.3</td><td><pre>你是一个schema专家，为美的空调、冰箱、热水器各一个产品页面添加FAQ结构化数据（使用JSON-LD），并验证通过Rich Results Test。</pre></td></tr><tr><td>Day 30</td><td>发布月度报告，总结AI可见度提升，并制定下月计划</td><td>内部会议</td><td>0.2</td><td><pre>你是一个内部总结报告生成器，基于前29天活动，计算提及率、top3率提升，撰写概要，并建议下月在抖音加大投入。</pre></td></tr></table>\n  </main>\n</body>\n</html>",
+    "created_at": "2026-08-01T02:38:54.785440Z"
+  },
+  "error": null,
+  "created_at": "2026-08-01T02:37:16.146731Z",
+  "updated_at": "2026-08-01T02:38:54.785440Z"
+}

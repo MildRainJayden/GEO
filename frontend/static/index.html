@@ -13,7 +13,7 @@
     label { display: block; font-size: 13px; font-weight: 700; margin: 12px 0 6px; }
     .check { display: flex; align-items: center; gap: 8px; margin-top: 12px; font-weight: 700; font-size: 13px; }
     .check input { width: auto; }
-    input, textarea { width: 100%; box-sizing: border-box; border: 1px solid #cbd5e1; border-radius: 6px; padding: 10px 12px; font: inherit; background: white; }
+    input, textarea, select { width: 100%; box-sizing: border-box; border: 1px solid #cbd5e1; border-radius: 6px; padding: 10px 12px; font: inherit; background: white; }
     textarea { min-height: 76px; resize: vertical; }
     button { margin-top: 14px; border: 0; border-radius: 6px; padding: 11px 14px; background: #0f766e; color: white; font-weight: 800; cursor: pointer; }
     button:disabled { opacity: .6; cursor: wait; }
@@ -25,7 +25,15 @@
     th, td { border-bottom: 1px solid #e5eaf0; padding: 9px 8px; text-align: left; font-size: 14px; }
     th { background: #edf3f8; }
     pre { background: #111827; color: #e5e7eb; border-radius: 6px; padding: 12px; white-space: pre-wrap; overflow: auto; }
+    .chart-grid { display: grid; grid-template-columns: minmax(240px, .9fr) minmax(320px, 1.1fr); gap: 14px; margin: 16px 0; }
+    .chart-card { border: 1px solid #d9e2ec; border-radius: 8px; padding: 14px; background: #fbfdff; }
+    .chart-card h3 { margin-top: 0; }
+    svg.chart { width: 100%; height: auto; overflow: visible; }
+    .legend { display: grid; gap: 7px; font-size: 13px; margin-top: 10px; }
+    .legend span { display: inline-flex; align-items: center; gap: 8px; }
+    .swatch { width: 11px; height: 11px; border-radius: 3px; display: inline-block; }
     @media (max-width: 900px) { main { grid-template-columns: 1fr; } }
+    @media (max-width: 720px) { .chart-grid { grid-template-columns: 1fr; } }
   </style>
 </head>
 <body>
@@ -102,7 +110,8 @@
     });
 
     function renderResult(result, id) {
-      const platforms = result.score.platform_scores.map(row => `<tr><td>${row.provider}</td><td>${row.score}</td><td>${Math.round(row.mention_rate * 100)}%</td><td>${Math.round(row.top3_rate * 100)}%</td><td>${row.explanation || ""}</td></tr>`).join("");
+      const platforms = result.score.platform_scores.map(row => `<tr><td>${row.provider}</td><td>${row.score}</td><td>${Math.round(row.mention_rate * 100)}%</td><td>${Math.round(row.accuracy_rate * 100)}%</td><td>${row.explanation || ""}</td></tr>`).join("");
+      const competitors = result.competitors.slice(0, 8).map(row => `<tr><td>${escapeHtml(row.brand)}</td><td>${Math.round(row.mention_rate * 100)}%</td><td>${Math.round(row.industry_coverage * 100)}%</td><td>${Math.round(row.scenario_coverage * 100)}%</td></tr>`).join("");
       const gaps = result.content_gaps.map(gap => `<li><strong>${gap.priority}</strong> ${gap.question}：${gap.reason}</li>`).join("");
       const suggestion = result.geo_suggestions[0];
       const taskPrompts = result.tasks.slice(0, 5).map(task => `<details><summary>Day ${task.day} ${task.title}</summary><pre>${task.prompt_template || ""}</pre></details>`).join("");
@@ -115,8 +124,15 @@
         </div>
         <h3>自动补全信息</h3>
         <p>${result.input.industry || "未识别行业"} · ${result.input.product_text}</p>
+        <div class="chart-grid">
+          <div class="chart-card"><h3>评分构成</h3>${scorePie(result)}</div>
+          <div class="chart-card"><h3>平台得分</h3>${barChart(result.score.platform_scores.map(row => [row.provider, row.score, 100]), "")}</div>
+        </div>
         <h3>平台表现</h3>
-        <table><tr><th>平台</th><th>评分</th><th>提及</th><th>Top3</th><th>解释</th></tr>${platforms}</table>
+        <table><tr><th>平台</th><th>评分</th><th>提及率</th><th>准确率</th><th>解释</th></tr>${platforms}</table>
+        <h3>行业基准竞品矩阵</h3>
+        <div class="chart-card">${barChart(result.competitors.slice(0, 10).map(row => [row.brand, row.mention_rate * 100, 100]), "%")}</div>
+        <table><tr><th>品牌</th><th>短名单显著度</th><th>行业上下文</th><th>场景题</th></tr>${competitors}</table>
         <h3>内容缺口</h3>
         <ul>${gaps}</ul>
         <h3>${suggestion.title}</h3>
@@ -127,6 +143,57 @@
         <p><a href="/audit/${id}/report" target="_blank" rel="noreferrer">打开 HTML 报告</a></p>
         <p><a href="/audit/${id}/report.pdf" target="_blank" rel="noreferrer">下载 PDF 报告</a></p>
       `;
+    }
+
+    function scorePie(result) {
+      const parts = [
+        ["品牌提及", result.score.mention_rate_score, 40, "#0f766e"],
+        ["准确率", result.score.accuracy_score, 30, "#2563eb"],
+        ["行业/产品覆盖", result.score.industry_coverage_score, 20, "#ca8a04"],
+        ["平台覆盖", result.score.platform_coverage_score, 10, "#7c3aed"],
+      ];
+      const radius = 58;
+      const circumference = 2 * Math.PI * radius;
+      const total = Math.max(1, parts.reduce((sum, part) => sum + part[1], 0));
+      let offset = 0;
+      const circles = parts.map(([label, value, maxValue, color]) => {
+        const length = value / total * circumference;
+        const circle = `<circle cx="84" cy="84" r="${radius}" fill="none" stroke="${color}" stroke-width="28" stroke-dasharray="${length.toFixed(2)} ${(circumference - length).toFixed(2)}" stroke-dashoffset="${(-offset).toFixed(2)}" transform="rotate(-90 84 84)" />`;
+        offset += length;
+        return circle;
+      }).join("");
+      const legend = parts.map(([label, value, maxValue, color]) => `<span><i class="swatch" style="background:${color}"></i>${label}：${Number(value).toFixed(1)}/${maxValue}</span>`).join("");
+      return `<div style="display:grid;grid-template-columns:170px 1fr;gap:14px;align-items:center">
+        <svg class="chart" viewBox="0 0 168 168" role="img" aria-label="评分构成饼图">
+          <circle cx="84" cy="84" r="58" fill="none" stroke="#e5eaf0" stroke-width="28"></circle>
+          ${circles}
+          <text x="84" y="78" text-anchor="middle" font-size="22" font-weight="700" fill="#1d2733">${Number(result.score.total_score).toFixed(1)}</text>
+          <text x="84" y="100" text-anchor="middle" font-size="12" fill="#667085">总分</text>
+        </svg>
+        <div class="legend">${legend}</div>
+      </div>`;
+    }
+
+    function barChart(items, suffix) {
+      if (!items.length) return `<p>暂无数据</p>`;
+      const width = 620;
+      const left = 126;
+      const rowH = 34;
+      const height = 24 + items.length * rowH;
+      const bars = items.map(([label, value, maxValue], index) => {
+        const y = 18 + index * rowH;
+        const pct = Math.max(0, Math.min(1, value / Math.max(1, maxValue)));
+        const barW = pct * (width - left - 72);
+        return `<text x="0" y="${y + 15}" font-size="12" fill="#425466">${escapeHtml(String(label).slice(0, 18))}</text>
+          <rect x="${left}" y="${y}" width="${width-left-72}" height="18" rx="5" fill="#edf3f8"></rect>
+          <rect x="${left}" y="${y}" width="${barW.toFixed(1)}" height="18" rx="5" fill="#0f766e"></rect>
+          <text x="${width - 58}" y="${y + 14}" font-size="12" fill="#1d2733">${Math.round(value)}${suffix}</text>`;
+      }).join("");
+      return `<svg class="chart" viewBox="0 0 ${width} ${height}" role="img" aria-label="条形图">${bars}</svg>`;
+    }
+
+    function escapeHtml(value) {
+      return value.replace(/[&<>"']/g, char => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[char]));
     }
   </script>
 </body>
