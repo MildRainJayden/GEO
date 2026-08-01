@@ -9,7 +9,9 @@ os.environ["AIVC_DISABLE_WEB_RESEARCH"] = "1"
 
 from backend.aivc.cli import NIKE_REQUEST
 from backend.aivc.analysis.scoring import compute_visibility_score
-from backend.aivc.models import AuditRequest, BrandMentionAnalysis, ProviderResponse
+from backend.aivc.models import AuditRequest, BrandInput, BrandMentionAnalysis, ProviderResponse, Question
+from backend.aivc.providers.base import ProviderClient, ProviderRegistry
+from backend.aivc.providers.simulated import ProviderProfile, SimulatedProvider
 from backend.aivc.question_generation import generate_questions
 from backend.aivc.services.audit_service import AuditService
 
@@ -98,6 +100,38 @@ class AIVCTestCase(unittest.TestCase):
         score = compute_visibility_score(analyses, responses, provider_count=1)
         self.assertLess(score.total_score, 100)
         self.assertEqual(score.total_score, 82.0)
+
+    def test_provider_failure_does_not_fail_entire_audit(self) -> None:
+        async def run() -> None:
+            registry = ProviderRegistry()
+            registry.register(SimulatedProvider(ProviderProfile("deepseek", "test-ok", 1.0, 0.0, 0.0)))
+            registry.register(FailingProvider())
+            service = AuditService(registry=registry)
+            request = AuditRequest(
+                brand_name="Nike",
+                website="https://www.nike.com",
+                industry="sportswear",
+                products=["shoes"],
+                competitors=["Adidas"],
+                providers=["deepseek", "doubao"],
+                question_count=10,
+            )
+            record = await service.create_audit(request)
+            self.assertEqual(record.status, "completed")
+            result = record.result
+            assert result is not None
+            self.assertEqual({response.provider for response in result.responses}, {"deepseek"})
+            self.assertEqual(len(result.responses), len(result.questions))
+
+        asyncio.run(run())
+
+
+class FailingProvider(ProviderClient):
+    name = "doubao"
+    model_version = "test-failing"
+
+    async def query(self, question: Question, brand: BrandInput) -> ProviderResponse:
+        raise RuntimeError("doubao test failure")
 
 
 if __name__ == "__main__":

@@ -13,7 +13,8 @@ from ..analysis.scoring import compute_visibility_score
 from ..analysis.visibility import analyze_brand_response
 from ..config import load_dotenv
 from ..models import AuditRecord, AuditRequest, AuditResult, BrandInput
-from ..providers.base import ProviderRegistry
+from ..models import ProviderResponse, Question
+from ..providers.base import ProviderClient, ProviderRegistry
 from ..providers.simulated import build_default_registry
 from ..question_generation import generate_questions
 from ..report.html import render_report_html
@@ -47,17 +48,21 @@ class AuditService:
         web_evidence = await collect_web_evidence(brand)
         questions = generate_questions(brand, question_count)
         providers = self.registry.select(provider_names)
-        query_tasks = [provider.query(question, brand) for question in questions for provider in providers]
-        responses = await asyncio.gather(*query_tasks)
+        responses, provider_errors = await _query_providers(providers, questions, brand)
+        if not responses:
+            error_detail = "; ".join(f"{name}: {message}" for name, message in provider_errors.items())
+            raise RuntimeError(f"All provider queries failed: {error_detail}")
+        successful_provider_names = {response.provider for response in responses}
+        successful_providers = [provider for provider in providers if provider.name in successful_provider_names]
         analyses = [analyze_brand_response(response, brand) for response in responses]
-        score = compute_visibility_score(analyses, responses, len(providers))
+        score = compute_visibility_score(analyses, responses, len(successful_providers))
         citations = summarize_citations(responses)
         try:
-            competitors = await build_industry_benchmark_matrix(brand, providers)
+            competitors = await build_industry_benchmark_matrix(brand, successful_providers)
         except Exception:
             competitors = build_competitor_matrix(brand, questions, responses, analyses)
         content_gaps, geo_suggestions, tasks = await generate_personalized_strategy(
-            brand, responses, analyses, score, providers, web_evidence
+            brand, responses, analyses, score, successful_providers, web_evidence
         )
         predictions = predict_recommendation_probability(score)
         result = AuditResult(
@@ -82,3 +87,23 @@ class AuditService:
 
 
 default_service = AuditService()
+
+
+async def _query_providers(
+    providers: list[ProviderClient],
+    questions: list[Question],
+    brand: BrandInput,
+) -> tuple[list[ProviderResponse], dict[str, str]]:
+    jobs = [(provider, question) for question in questions for provider in providers]
+    results = await asyncio.gather(
+        *(provider.query(question, brand) for provider, question in jobs),
+        return_exceptions=True,
+    )
+    responses: list[ProviderResponse] = []
+    provider_errors: dict[str, str] = {}
+    for (provider, _question), result in zip(jobs, results):
+        if isinstance(result, Exception):
+            provider_errors.setdefault(provider.name, str(result))
+            continue
+        responses.append(result)
+    return responses, provider_errors
