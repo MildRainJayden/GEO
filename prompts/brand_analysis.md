@@ -1,0 +1,1 @@
+请把 AI 回答结构化为 JSON：brand_mentioned、mention_count、recommendation_position、sentiment、description_correct、error_types、industry_terms_covered。

@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>AIVC - AI Visibility China</title>
+  <style>
+    :root { color-scheme: light; font-family: Arial, "Microsoft YaHei", sans-serif; }
+    body { margin: 0; background: #f4f7fa; color: #162231; }
+    header { padding: 22px 5vw; background: #111827; color: white; display: flex; justify-content: space-between; align-items: center; gap: 16px; flex-wrap: wrap; }
+    h1 { margin: 0; font-size: 22px; letter-spacing: 0; }
+    main { padding: 24px 5vw 48px; display: grid; grid-template-columns: 360px 1fr; gap: 20px; }
+    label { display: block; font-size: 13px; font-weight: 700; margin: 12px 0 6px; }
+    .check { display: flex; align-items: center; gap: 8px; margin-top: 12px; font-weight: 700; font-size: 13px; }
+    .check input { width: auto; }
+    input, textarea { width: 100%; box-sizing: border-box; border: 1px solid #cbd5e1; border-radius: 6px; padding: 10px 12px; font: inherit; background: white; }
+    textarea { min-height: 76px; resize: vertical; }
+    button { margin-top: 14px; border: 0; border-radius: 6px; padding: 11px 14px; background: #0f766e; color: white; font-weight: 800; cursor: pointer; }
+    button:disabled { opacity: .6; cursor: wait; }
+    section, form { background: white; border: 1px solid #d9e2ec; border-radius: 8px; padding: 18px; }
+    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; }
+    .metric { border: 1px solid #e2e8f0; border-radius: 8px; padding: 14px; background: #fbfdff; }
+    .metric strong { display: block; font-size: 28px; margin-top: 4px; }
+    table { width: 100%; border-collapse: collapse; margin-top: 12px; }
+    th, td { border-bottom: 1px solid #e5eaf0; padding: 9px 8px; text-align: left; font-size: 14px; }
+    th { background: #edf3f8; }
+    pre { background: #111827; color: #e5e7eb; border-radius: 6px; padding: 12px; white-space: pre-wrap; overflow: auto; }
+    @media (max-width: 900px) { main { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>AI Visibility China</h1>
+    <span>中国 AI 搜索可见度与 GEO 优化平台</span>
+  </header>
+  <main>
+    <form id="auditForm">
+      <h2>新建测评</h2>
+      <label>品牌</label>
+      <input name="brand_name" value="美的" required />
+      <label>官网</label>
+      <input name="website" placeholder="可为空，系统自动调研补充" />
+      <label>行业</label>
+      <input name="industry" placeholder="可为空，系统自动调研补充" />
+      <label>主要产品，每行一个</label>
+      <textarea name="products" placeholder="可为空，系统自动调研补充"></textarea>
+      <label>竞品，每行一个</label>
+      <textarea name="competitors" placeholder="可为空，系统自动调研补充"></textarea>
+      <label>模型</label>
+      <select name="provider">
+        <option value="">自动选择已配置模型</option>
+        <option value="gpt">GPT</option>
+        <option value="deepseek">DeepSeek</option>
+        <option value="doubao">豆包</option>
+        <option value="minimax">MiniMax</option>
+        <option value="qwen">千问</option>
+      </select>
+      <button id="runButton" type="submit">开始测评</button>
+    </form>
+    <section>
+      <h2>结果</h2>
+      <div id="status">等待测评。</div>
+      <div id="result"></div>
+    </section>
+  </main>
+  <script>
+    const form = document.getElementById("auditForm");
+    const button = document.getElementById("runButton");
+    const statusBox = document.getElementById("status");
+    const resultBox = document.getElementById("result");
+
+    form.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      button.disabled = true;
+      statusBox.textContent = "正在补全品牌信息、自动生成问题并调用选定模型...";
+      resultBox.innerHTML = "";
+      const formData = new FormData(form);
+      const data = Object.fromEntries(formData.entries());
+      data.products = data.products.split(/\n+/).map(v => v.trim()).filter(Boolean);
+      data.competitors = data.competitors.split(/\n+/).map(v => v.trim()).filter(Boolean);
+      data.providers = data.provider ? [data.provider] : [];
+      delete data.provider;
+      if (!data.website) delete data.website;
+      if (!data.industry) delete data.industry;
+      if (!data.providers.length) delete data.providers;
+      try {
+        const response = await fetch("/audit", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(data),
+        });
+        const audit = await response.json();
+        if (!response.ok) throw new Error(audit.error || "请求失败");
+        if (audit.status === "failed") throw new Error(audit.error || "任务失败");
+        renderResult(audit.result, audit.id);
+        statusBox.textContent = `测评完成：${audit.id}`;
+      } catch (error) {
+        statusBox.textContent = error.message;
+      } finally {
+        button.disabled = false;
+      }
+    });
+
+    function renderResult(result, id) {
+      const platforms = result.score.platform_scores.map(row => `<tr><td>${row.provider}</td><td>${row.score}</td><td>${Math.round(row.mention_rate * 100)}%</td><td>${Math.round(row.top3_rate * 100)}%</td><td>${row.explanation || ""}</td></tr>`).join("");
+      const gaps = result.content_gaps.map(gap => `<li><strong>${gap.priority}</strong> ${gap.question}：${gap.reason}</li>`).join("");
+      const suggestion = result.geo_suggestions[0];
+      const taskPrompts = result.tasks.slice(0, 5).map(task => `<details><summary>Day ${task.day} ${task.title}</summary><pre>${task.prompt_template || ""}</pre></details>`).join("");
+      resultBox.innerHTML = `
+        <div class="grid">
+          <div class="metric">总分<strong>${result.score.total_score}</strong></div>
+          <div class="metric">问题<strong>${result.questions.length}</strong></div>
+          <div class="metric">回答<strong>${result.responses.length}</strong></div>
+          <div class="metric">任务<strong>${result.tasks.length}</strong></div>
+        </div>
+        <h3>自动补全信息</h3>
+        <p>${result.input.industry || "未识别行业"} · ${result.input.product_text}</p>
+        <h3>平台表现</h3>
+        <table><tr><th>平台</th><th>评分</th><th>提及</th><th>Top3</th><th>解释</th></tr>${platforms}</table>
+        <h3>内容缺口</h3>
+        <ul>${gaps}</ul>
+        <h3>${suggestion.title}</h3>
+        <p>${suggestion.action}</p>
+        <pre>${suggestion.copyable_content}</pre>
+        <h3>30 天任务提示词模板</h3>
+        ${taskPrompts}
+        <p><a href="/audit/${id}/report" target="_blank" rel="noreferrer">打开 HTML 报告</a></p>
+        <p><a href="/audit/${id}/report.pdf" target="_blank" rel="noreferrer">下载 PDF 报告</a></p>
+      `;
+    }
+  </script>
+</body>
+</html>
