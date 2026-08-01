@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from collections import defaultdict
 
-from ..models import BrandMentionAnalysis, PlatformScore, ProviderResponse, ScoreBreakdown
+from ..models import BrandMentionAnalysis, CompetitorMetric, PlatformScore, ProviderResponse, ScoreBreakdown
 
 
 def compute_visibility_score(
@@ -39,9 +39,47 @@ def compute_visibility_score(
         platform_coverage_score=round(platform_coverage * 10, 2),
         citation_quality_score=round(citation_quality * 100, 2),
         industry_coverage_score=round(industry_coverage * 20, 2),
+        competitive_voice_score=0.0,
+        base_visibility_score=round(total_score, 2),
         platform_scores=_platform_scores(analyses, responses),
         trend_score=round(min(100, total_score + 7.5), 2),
     )
+
+
+def apply_competitive_voice_score(
+    score: ScoreBreakdown,
+    brand_name: str,
+    competitors: list[CompetitorMetric],
+) -> ScoreBreakdown:
+    if not competitors:
+        score.base_visibility_score = score.base_visibility_score or score.total_score
+        return score
+    own = next((item for item in competitors if item.brand.strip().lower() == brand_name.strip().lower()), None)
+    if own is None:
+        score.base_visibility_score = score.base_visibility_score or score.total_score
+        score.competitive_voice_score = 0.0
+        score.total_score = round(score.total_score * 0.7, 2)
+        score.trend_score = round(min(100, score.total_score + 7.5), 2)
+        return score
+
+    leader_share = max((item.voice_share or item.mention_rate for item in competitors), default=0.0)
+    own_share = own.voice_share or own.mention_rate
+    relative_share = own_share / leader_share if leader_share > 0 else 0.0
+    rank_score = _average_rank_score(own.average_rank)
+    competitive_score = (
+        own_share * 45
+        + min(relative_share, 1.0) * 25
+        + own.top3_rate * 15
+        + rank_score * 10
+        + own.occurrence_rate * 5
+    )
+
+    base_score = score.base_visibility_score or score.total_score
+    score.base_visibility_score = round(base_score, 2)
+    score.competitive_voice_score = round(competitive_score, 2)
+    score.total_score = round(base_score * 0.7 + competitive_score * 0.3, 2)
+    score.trend_score = round(min(100, score.total_score + 7.5), 2)
+    return score
 
 
 def _citation_quality(responses: list[ProviderResponse]) -> float:
@@ -124,6 +162,12 @@ def _sample_confidence(total_answers: int, provider_count: int) -> float:
     if provider_count < 2:
         return 0.95
     return 1.0
+
+
+def _average_rank_score(average_rank: float | None) -> float:
+    if average_rank is None:
+        return 0.0
+    return max(0.0, min(1.0, 1 - (average_rank - 1) / 4))
 
 
 def _quality_signal_rate(

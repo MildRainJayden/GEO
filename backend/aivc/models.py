@@ -136,6 +136,8 @@ class ScoreBreakdown(BaseModel):
     platform_coverage_score: float
     citation_quality_score: float
     industry_coverage_score: float
+    competitive_voice_score: float = 0.0
+    base_visibility_score: float = 0.0
     platform_scores: list[PlatformScore]
     trend_score: float
 
@@ -155,6 +157,11 @@ class CompetitorMetric(BaseModel):
     scenario_coverage: float
     citation_count: int
     accuracy_rate: float
+    voice_share: float = 0.0
+    occurrence_rate: float = 0.0
+    average_rank: float | None = None
+    effective_sample_count: int = 0
+    scenario_sample_count: int = 0
 
 
 class ContentGap(BaseModel):

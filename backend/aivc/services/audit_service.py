@@ -8,8 +8,8 @@ from ..analysis.citation import summarize_citations
 from ..analysis.geo_optimizer import (
     predict_recommendation_probability,
 )
-from ..analysis.recommendation import build_competitor_matrix, build_industry_benchmark_matrix
-from ..analysis.scoring import compute_visibility_score
+from ..analysis.recommendation import build_industry_benchmark_matrix
+from ..analysis.scoring import apply_competitive_voice_score, compute_visibility_score
 from ..analysis.visibility import analyze_brand_response
 from ..config import load_dotenv
 from ..models import AuditRecord, AuditRequest, AuditResult, BrandInput
@@ -60,7 +60,8 @@ class AuditService:
         try:
             competitors = await build_industry_benchmark_matrix(brand, successful_providers)
         except Exception:
-            competitors = build_competitor_matrix(brand, questions, responses, analyses)
+            competitors = []
+        score = apply_competitive_voice_score(score, brand.brand_name, competitors)
         content_gaps, geo_suggestions, tasks = await generate_personalized_strategy(
             brand, responses, analyses, score, successful_providers, web_evidence
         )

@@ -8,10 +8,12 @@ os.environ["AIVC_DISABLE_REAL_PROVIDERS"] = "1"
 os.environ["AIVC_DISABLE_WEB_RESEARCH"] = "1"
 
 from backend.aivc.cli import NIKE_REQUEST
-from backend.aivc.analysis.scoring import compute_visibility_score
-from backend.aivc.models import AuditRequest, BrandInput, BrandMentionAnalysis, ProviderResponse, Question
+from backend.aivc.analysis.scoring import apply_competitive_voice_score, compute_visibility_score
+from backend.aivc.models import AuditRequest, BrandInput, BrandMentionAnalysis, CompetitorMetric, ProviderResponse, Question
 from backend.aivc.providers.base import ProviderClient, ProviderRegistry
 from backend.aivc.providers.simulated import ProviderProfile, SimulatedProvider
+from backend.aivc.analysis.recommendation import build_industry_benchmark_matrix
+from backend.aivc.services.research_service import enrich_request
 from backend.aivc.question_generation import generate_questions
 from backend.aivc.services.audit_service import AuditService
 
@@ -101,6 +103,72 @@ class AIVCTestCase(unittest.TestCase):
         self.assertLess(score.total_score, 100)
         self.assertEqual(score.total_score, 82.0)
 
+    def test_low_competitive_voice_reduces_total_score(self) -> None:
+        analyses = [
+            BrandMentionAnalysis(
+                provider="deepseek",
+                question_id=str(index),
+                brand_mentioned=True,
+                mention_count=1,
+                recommendation_position="Top5",
+                sentiment="积极",
+                description_correct=True,
+                industry_terms_covered=["家电"],
+            )
+            for index in range(60)
+        ]
+        responses = [
+            ProviderResponse(
+                provider="deepseek",
+                model_version="test",
+                question_id=str(index),
+                question="长虹怎么样",
+                answer="长虹是家电品牌。",
+                latency_ms=1,
+                token_count=10,
+            )
+            for index in range(60)
+        ]
+        score = compute_visibility_score(analyses, responses, provider_count=2)
+        score.total_score = 92.0
+        score.base_visibility_score = 92.0
+        adjusted = apply_competitive_voice_score(
+            score,
+            "长虹",
+            [
+                CompetitorMetric(
+                    brand="美的",
+                    mention_rate=0.35,
+                    top3_rate=1,
+                    industry_coverage=1,
+                    scenario_coverage=1,
+                    citation_count=0,
+                    accuracy_rate=1,
+                    voice_share=0.35,
+                    occurrence_rate=1,
+                    average_rank=1,
+                    effective_sample_count=5,
+                    scenario_sample_count=1,
+                ),
+                CompetitorMetric(
+                    brand="长虹",
+                    mention_rate=0.05,
+                    top3_rate=0,
+                    industry_coverage=0.1,
+                    scenario_coverage=0,
+                    citation_count=0,
+                    accuracy_rate=0.4,
+                    voice_share=0.05,
+                    occurrence_rate=0.4,
+                    average_rank=6,
+                    effective_sample_count=5,
+                    scenario_sample_count=1,
+                ),
+            ],
+        )
+        self.assertEqual(adjusted.base_visibility_score, 92.0)
+        self.assertLess(adjusted.total_score, 75.0)
+
     def test_provider_failure_does_not_fail_entire_audit(self) -> None:
         async def run() -> None:
             registry = ProviderRegistry()
@@ -125,6 +193,53 @@ class AIVCTestCase(unittest.TestCase):
 
         asyncio.run(run())
 
+    def test_industry_benchmark_uses_neutral_brand_context(self) -> None:
+        async def run() -> None:
+            provider = EchoBrandProvider()
+            brand = BrandInput(
+                brand_name="美的",
+                industry="家电制造",
+                products=["空调"],
+                competitors=["格力"],
+            )
+            await build_industry_benchmark_matrix(brand, [provider])
+            self.assertTrue(all(name.startswith("候选品牌池：") for name in provider.seen_brand_names))
+            self.assertNotEqual(provider.seen_brand_names[0], "美的")
+
+        asyncio.run(run())
+
+    def test_industry_benchmark_uses_relative_voice_share(self) -> None:
+        async def run() -> None:
+            provider = EchoBrandProvider()
+            brand = BrandInput(
+                brand_name="海信",
+                industry="家电制造",
+                products=["电视"],
+                competitors=["海尔", "美的", "格力"],
+            )
+            matrix = await build_industry_benchmark_matrix(brand, [provider])
+            share_sum = sum(item.mention_rate for item in matrix)
+            self.assertAlmostEqual(share_sum, 1.0, places=2)
+            self.assertLess(max(item.mention_rate for item in matrix), 1.0)
+
+        asyncio.run(run())
+
+    def test_home_appliance_industry_uses_concrete_competitors(self) -> None:
+        async def run() -> None:
+            service = AuditService()
+            brand, _question_count, _providers = await enrich_request(
+                AuditRequest(brand_name="海信", industry="家电制造", question_count=10, providers=["deepseek"]),
+                service.registry,
+            )
+            self.assertNotIn("主要竞品", brand.competitors)
+            self.assertNotIn("替代品牌", brand.competitors)
+            self.assertNotIn("同类品牌", brand.competitors)
+            self.assertNotIn("海信", brand.competitors)
+            self.assertIn("海尔", brand.competitors)
+            self.assertIn("美的", brand.competitors)
+
+        asyncio.run(run())
+
 
 class FailingProvider(ProviderClient):
     name = "doubao"
@@ -132,6 +247,26 @@ class FailingProvider(ProviderClient):
 
     async def query(self, question: Question, brand: BrandInput) -> ProviderResponse:
         raise RuntimeError("doubao test failure")
+
+
+class EchoBrandProvider(ProviderClient):
+    name = "echo"
+    model_version = "test-echo"
+
+    def __init__(self) -> None:
+        self.seen_brand_names: list[str] = []
+
+    async def query(self, question: Question, brand: BrandInput) -> ProviderResponse:
+        self.seen_brand_names.append(brand.brand_name)
+        return ProviderResponse(
+            provider=self.name,
+            model_version=self.model_version,
+            question_id=question.id,
+            question=question.text,
+            answer="海信、美的、格力、海尔是家电制造行业常见品牌。",
+            latency_ms=1,
+            token_count=10,
+        )
 
 
 if __name__ == "__main__":

@@ -50,7 +50,8 @@ class OpenAICompatibleProvider(ProviderClient):
             or ""
         )
         self.extra_payload = dict(config.extra_payload)
-        self.timeout_seconds = timeout_seconds
+        timeout_env = _first_env([f"{config.name.upper()}_TIMEOUT_SECONDS", "AIVC_PROVIDER_TIMEOUT_SECONDS"])
+        self.timeout_seconds = int(timeout_env) if timeout_env.isdigit() else (120 if config.name == "doubao" else timeout_seconds)
         if not self.api_key:
             env_names = ", ".join([*config.api_key_envs, config.api_key_env or "API_KEY"])
             raise ValueError(f"{env_names} is required for provider {self.name}")
@@ -106,9 +107,9 @@ class OpenAICompatibleProvider(ProviderClient):
         payload.update(self.extra_payload)
         request = Request(
             f"{self.base_url}/chat/completions",
-            data=json.dumps(payload, ensure_ascii=False).encode("utf-8"),
+            data=json.dumps(payload, ensure_ascii=True).encode("utf-8"),
             headers={
-                "Content-Type": "application/json",
+                "Content-Type": "application/json; charset=utf-8",
                 "Authorization": f"Bearer {self.api_key}",
             },
             method="POST",

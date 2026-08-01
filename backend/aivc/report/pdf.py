@@ -3,17 +3,17 @@ from __future__ import annotations
 from pathlib import Path
 from xml.sax.saxutils import escape
 
-from reportlab.lib.pagesizes import A4
+from reportlab.graphics.charts.piecharts import Pie
+from reportlab.graphics.shapes import Drawing, Rect, String
 from reportlab.lib import colors
+from reportlab.lib.pagesizes import A4
 from reportlab.lib.styles import ParagraphStyle, getSampleStyleSheet
 from reportlab.lib.units import mm
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.cidfonts import UnicodeCIDFont
-from reportlab.graphics.charts.piecharts import Pie
-from reportlab.graphics.shapes import Drawing, Rect, String
 from reportlab.platypus import PageBreak, Paragraph, SimpleDocTemplate, Spacer, Table, TableStyle
 
-from ..models import AuditResult
+from ..models import AuditResult, CompetitorMetric
 
 
 def write_pdf_report(result: AuditResult, output_path: str | Path) -> Path:
@@ -43,6 +43,9 @@ def write_pdf_report(result: AuditResult, output_path: str | Path) -> Path:
     story.append(Paragraph(f"总体得分：{result.score.total_score}", styles["Score"]))
     story.append(Spacer(1, 8))
 
+    story.append(Paragraph("报告总结", styles["HeadingCN"]))
+    story.append(Paragraph(_summary_text(result), styles["NoteCN"]))
+
     story.append(Paragraph("数据图览", styles["HeadingCN"]))
     story.append(
         Table(
@@ -65,41 +68,47 @@ def write_pdf_report(result: AuditResult, output_path: str | Path) -> Path:
     story.append(Paragraph("核心评分", styles["HeadingCN"]))
     story.append(_table([
         ["指标", "得分", "说明"],
-        ["品牌提及", f"{result.score.mention_rate_score}/40", "回答中是否稳定出现品牌实体"],
-        ["准确率", f"{result.score.accuracy_score}/30", "回答是否覆盖正确行业与产品事实"],
-        ["行业/产品覆盖", f"{result.score.industry_coverage_score}/20", "品牌相关产品词是否被覆盖"],
-        ["平台覆盖", f"{result.score.platform_coverage_score}/10", "已测平台中是否都有品牌曝光"],
+        ["品牌提及", f"{result.score.mention_rate_score}/40", "回答中是否稳定出现品牌实体。"],
+        ["准确率", f"{result.score.accuracy_score}/30", "回答是否覆盖正确行业与产品事实。"],
+        ["行业/产品覆盖", f"{result.score.industry_coverage_score}/20", "品牌相关产品词是否被覆盖。"],
+        ["平台覆盖", f"{result.score.platform_coverage_score}/10", "成功测评的平台中是否均有品牌曝光。"],
+        ["竞争声量", f"{result.score.competitive_voice_score}/100", "品牌在行业基准竞品矩阵中的相对声量、排名、Top3表现。"],
     ], [42 * mm, 28 * mm, 94 * mm], styles))
+    story.append(Paragraph("说明：最终总分 = 基础可见度 70% + 竞争声量 30%。当品牌自身问题表现好、但行业声量份额低时，总分会被拉低。", styles["NoteCN"]))
 
     story.append(Paragraph("平台表现", styles["HeadingCN"]))
+    story.append(Paragraph("说明：平台得分按单个模型的回答单独计算；多模型总分聚合所有成功模型的回答。", styles["NoteCN"]))
     platform_data = [["平台", "评分", "提及率", "准确率", "中文解释"]]
     for p in result.score.platform_scores:
         platform_data.append([p.provider, p.score, f"{p.mention_rate:.0%}", f"{p.accuracy_rate:.0%}", p.explanation])
     story.append(_table(platform_data, [24 * mm, 20 * mm, 22 * mm, 22 * mm, 76 * mm], styles))
 
     story.append(Paragraph("行业基准竞品矩阵", styles["HeadingCN"]))
+    story.append(Paragraph("说明：AI 声量份额是候选品牌在行业基准回答中的排名加权份额；出现率表示有效回答中有多少比例提到该品牌；平均排名越小越靠前；Top3率表示进入前三的比例；场景题出现率只统计场景类问题。0 表示本轮有效样本未提及。", styles["NoteCN"]))
     story.append(
         _bar_drawing(
-            [(c.brand, c.mention_rate * 100) for c in result.competitors[:10]],
-            "竞品短名单显著度",
+            [(c.brand, (c.voice_share or c.mention_rate) * 100) for c in result.competitors[:10]],
+            "AI 声量份额",
             160 * mm,
             62 * mm,
         )
     )
     story.append(Spacer(1, 6))
-    competitor_data = [["品牌", "短名单显著度", "行业上下文显著度", "场景题显著度"]]
+    competitor_data = [["品牌", "AI声量", "出现率", "平均排名", "Top3率", "场景率", "样本"]]
     for c in result.competitors:
-        competitor_data.append([c.brand, f"{c.mention_rate:.0%}", f"{c.industry_coverage:.0%}", f"{c.scenario_coverage:.0%}"])
-    story.append(_table(competitor_data, [52 * mm, 36 * mm, 36 * mm, 36 * mm], styles))
+        competitor_data.append(_competitor_row(c))
+    story.append(_table(competitor_data, [34 * mm, 22 * mm, 22 * mm, 22 * mm, 20 * mm, 20 * mm, 24 * mm], styles))
 
     story.append(PageBreak())
     story.append(Paragraph("内容缺口", styles["HeadingCN"]))
+    story.append(Paragraph("说明：内容缺口结合模型回答中的弱项、竞品上下文和 AI 个性化分析生成，用于指导官网、FAQ、对比页、案例页等内容建设。", styles["NoteCN"]))
     gap_data = [["优先级", "问题", "建议类型", "原因"]]
     for gap in result.content_gaps:
         gap_data.append([gap.priority, gap.question, gap.recommendation_type, gap.reason])
     story.append(_table(gap_data, [18 * mm, 62 * mm, 24 * mm, 60 * mm], styles))
 
     story.append(Paragraph("GEO 优化建议", styles["HeadingCN"]))
+    story.append(Paragraph("说明：建议优先面向 AI 容易引用和总结的内容形态，例如结构化 FAQ、参数对比、权威来源、真实案例和清晰结论。", styles["NoteCN"]))
     suggestion_data = [["类别", "标题", "动作"]]
     for suggestion in result.geo_suggestions:
         suggestion_data.append([suggestion.category, suggestion.title, suggestion.action])
@@ -122,6 +131,7 @@ def _styles(font_name: str) -> dict[str, ParagraphStyle]:
         "TitleCN": ParagraphStyle("TitleCN", parent=base["Title"], fontName=font_name, fontSize=22, leading=28, spaceAfter=8),
         "HeadingCN": ParagraphStyle("HeadingCN", parent=base["Heading2"], fontName=font_name, fontSize=14, leading=18, spaceBefore=12, spaceAfter=8),
         "BodyCN": ParagraphStyle("BodyCN", parent=base["BodyText"], fontName=font_name, fontSize=9, leading=13),
+        "NoteCN": ParagraphStyle("NoteCN", parent=base["BodyText"], fontName=font_name, fontSize=8, leading=12, textColor=colors.HexColor("#425466"), spaceAfter=6),
         "CellCN": ParagraphStyle("CellCN", parent=base["BodyText"], fontName=font_name, fontSize=8, leading=11),
         "Score": ParagraphStyle("Score", parent=base["Title"], fontName=font_name, fontSize=32, leading=38, textColor=colors.HexColor("#0f766e")),
     }
@@ -163,6 +173,27 @@ def _footer(font_name: str):
         canvas.restoreState()
 
     return draw
+
+
+def _competitor_row(metric: CompetitorMetric) -> list[object]:
+    avg_rank = f"{metric.average_rank:.2f}" if metric.average_rank is not None else "-"
+    return [
+        metric.brand,
+        f"{(metric.voice_share or metric.mention_rate):.0%}",
+        f"{(metric.occurrence_rate or metric.accuracy_rate):.0%}",
+        avg_rank,
+        f"{metric.top3_rate:.0%}",
+        f"{metric.scenario_coverage:.0%}",
+        metric.effective_sample_count or "-",
+    ]
+
+
+def _summary_text(result: AuditResult) -> str:
+    brand = result.input.brand_name
+    leader = result.competitors[0].brand if result.competitors else "暂无竞品数据"
+    brand_metric = next((item for item in result.competitors if item.brand == brand), None)
+    share = f"{(brand_metric.voice_share or brand_metric.mention_rate):.0%}" if brand_metric else "暂无"
+    return f"{brand} 本轮 AI 可见度总分为 {result.score.total_score}，其中基础可见度为 {result.score.base_visibility_score}，竞争声量分为 {result.score.competitive_voice_score}。行业基准竞品矩阵中，当前声量领先品牌为 {leader}；{brand} 的 AI 声量份额为 {share}。"
 
 
 def _score_pie(result: AuditResult) -> Drawing:

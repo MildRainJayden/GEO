@@ -41,6 +41,25 @@ KNOWN_BRANDS: dict[str, BrandResearch] = {
     ),
 }
 
+INDUSTRY_RESEARCH: dict[str, BrandResearch] = {
+    "家电制造": BrandResearch(
+        website=None,
+        industry="家电制造",
+        products=["电视", "冰箱", "空调", "洗衣机", "厨电", "热水器", "智能家居"],
+        competitors=["海尔", "美的", "格力", "海信", "TCL", "长虹", "小米", "创维", "奥克斯"],
+        regions=["中国", "北京", "上海", "广州", "深圳", "成都", "杭州"],
+    ),
+    "家电": BrandResearch(
+        website=None,
+        industry="家电制造",
+        products=["电视", "冰箱", "空调", "洗衣机", "厨电", "热水器", "智能家居"],
+        competitors=["海尔", "美的", "格力", "海信", "TCL", "长虹", "小米", "创维", "奥克斯"],
+        regions=["中国", "北京", "上海", "广州", "深圳", "成都", "杭州"],
+    ),
+}
+
+GENERIC_ITEMS = {"主要竞品", "替代品牌", "同类品牌", "竞争对手", "核心产品", "主力服务", "旗舰产品"}
+
 
 async def enrich_request(request: AuditRequest, registry: ProviderRegistry) -> tuple[BrandInput, int, list[str]]:
     research = await _research_with_ai(request, registry) if _needs_research(request) else None
@@ -50,6 +69,13 @@ async def enrich_request(request: AuditRequest, registry: ProviderRegistry) -> t
     industry = request.industry or research.industry
     products = request.products or research.products
     competitors = request.competitors or research.competitors
+    industry_research = _industry_research(industry)
+    if industry_research:
+        if not products or _has_generic_items(products):
+            products = industry_research.products
+        if not competitors or _has_generic_items(competitors):
+            competitors = industry_research.competitors
+    competitors = [item for item in competitors if item.strip().lower() != request.brand_name.strip().lower()]
     regions = request.regions or research.regions
     question_count = request.question_count or _adaptive_question_count(products, competitors, bool(request.industry), bool(request.website))
 
@@ -124,6 +150,18 @@ def _as_list(value: object) -> list[str]:
 
 def _known_brand(brand_name: str) -> BrandResearch | None:
     return KNOWN_BRANDS.get(brand_name.lower()) or KNOWN_BRANDS.get(brand_name)
+
+
+def _industry_research(industry: str) -> BrandResearch | None:
+    normalized = industry.strip().lower()
+    for key, research in INDUSTRY_RESEARCH.items():
+        if key.lower() in normalized or normalized in key.lower():
+            return research
+    return None
+
+
+def _has_generic_items(items: list[str]) -> bool:
+    return any(item.strip() in GENERIC_ITEMS for item in items)
 
 
 def _generic_research(brand_name: str) -> BrandResearch:

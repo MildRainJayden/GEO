@@ -28,6 +28,8 @@
     .chart-grid { display: grid; grid-template-columns: minmax(240px, .9fr) minmax(320px, 1.1fr); gap: 14px; margin: 16px 0; }
     .chart-card { border: 1px solid #d9e2ec; border-radius: 8px; padding: 14px; background: #fbfdff; }
     .chart-card h3 { margin-top: 0; }
+    .note { color: #64748b; font-size: 13px; line-height: 1.7; }
+    .summary { background: #eef7f5; border-color: #b7d8d2; margin-bottom: 14px; }
     svg.chart { width: 100%; height: auto; overflow: visible; }
     .legend { display: grid; gap: 7px; font-size: 13px; margin-top: 10px; }
     .legend span { display: inline-flex; align-items: center; gap: 8px; }
@@ -111,17 +113,25 @@
 
     function renderResult(result, id) {
       const platforms = result.score.platform_scores.map(row => `<tr><td>${row.provider}</td><td>${row.score}</td><td>${Math.round(row.mention_rate * 100)}%</td><td>${Math.round(row.accuracy_rate * 100)}%</td><td>${row.explanation || ""}</td></tr>`).join("");
-      const competitors = result.competitors.slice(0, 8).map(row => `<tr><td>${escapeHtml(row.brand)}</td><td>${Math.round(row.mention_rate * 100)}%</td><td>${Math.round(row.industry_coverage * 100)}%</td><td>${Math.round(row.scenario_coverage * 100)}%</td></tr>`).join("");
+      const competitors = result.competitors.slice(0, 8).map(row => `<tr><td>${escapeHtml(row.brand)}</td><td>${percent(row.voice_share || row.mention_rate)}</td><td>${percent(row.occurrence_rate || row.accuracy_rate)}</td><td>${row.average_rank ? Number(row.average_rank).toFixed(2) : "-"}</td><td>${percent(row.top3_rate)}</td><td>${percent(row.scenario_coverage)}</td><td>${row.effective_sample_count || "-"}</td></tr>`).join("");
       const gaps = result.content_gaps.map(gap => `<li><strong>${gap.priority}</strong> ${gap.question}：${gap.reason}</li>`).join("");
       const suggestion = result.geo_suggestions[0];
       const taskPrompts = result.tasks.slice(0, 5).map(task => `<details><summary>Day ${task.day} ${task.title}</summary><pre>${task.prompt_template || ""}</pre></details>`).join("");
+      const leader = result.competitors[0]?.brand || "暂无竞品数据";
+      const own = result.competitors.find(row => row.brand === result.input.brand_name);
+      const ownShare = own ? percent(own.voice_share || own.mention_rate) : "暂无";
       resultBox.innerHTML = `
+        <section class="summary">
+          <h3>报告总结</h3>
+          <p>${escapeHtml(result.input.brand_name)} 本轮 AI 可见度总分为 ${result.score.total_score}，其中基础可见度为 ${result.score.base_visibility_score || result.score.total_score}，竞争声量分为 ${result.score.competitive_voice_score || 0}。行业基准竞品矩阵中，当前声量领先品牌为 ${escapeHtml(leader)}；${escapeHtml(result.input.brand_name)} 的 AI 声量份额为 ${ownShare}。</p>
+        </section>
         <div class="grid">
           <div class="metric">总分<strong>${result.score.total_score}</strong></div>
           <div class="metric">问题<strong>${result.questions.length}</strong></div>
           <div class="metric">回答<strong>${result.responses.length}</strong></div>
-          <div class="metric">任务<strong>${result.tasks.length}</strong></div>
+          <div class="metric">竞争声量<strong>${result.score.competitive_voice_score || 0}</strong></div>
         </div>
+        <p class="note">核心评分说明：基础可见度由品牌提及、描述准确率、行业/产品覆盖、平台覆盖计算；最终总分 = 基础可见度 70% + 竞争声量 30%。竞争声量来自行业基准竞品矩阵，因此当品牌自身问题表现好、但行业声量份额低时，总分会被拉低。</p>
         <h3>自动补全信息</h3>
         <p>${result.input.industry || "未识别行业"} · ${result.input.product_text}</p>
         <div class="chart-grid">
@@ -129,13 +139,17 @@
           <div class="chart-card"><h3>平台得分</h3>${barChart(result.score.platform_scores.map(row => [row.provider, row.score, 100]), "")}</div>
         </div>
         <h3>平台表现</h3>
+        <p class="note">说明：平台得分按单个模型的回答单独计算；多模型总分聚合所有成功模型的回答。</p>
         <table><tr><th>平台</th><th>评分</th><th>提及率</th><th>准确率</th><th>解释</th></tr>${platforms}</table>
         <h3>行业基准竞品矩阵</h3>
-        <div class="chart-card">${barChart(result.competitors.slice(0, 10).map(row => [row.brand, row.mention_rate * 100, 100]), "%")}</div>
-        <table><tr><th>品牌</th><th>短名单显著度</th><th>行业上下文</th><th>场景题</th></tr>${competitors}</table>
+        <p class="note">说明：AI 声量份额是候选品牌在行业基准回答中的排名加权份额，整张表加总约 100%；出现率表示有效回答中有多少比例提到该品牌；平均排名越小越靠前；Top3率表示进入前三的比例；场景题出现率只统计场景类问题。0 通常表示本轮有效样本未提及，不代表品牌没有真实市场影响力。</p>
+        <div class="chart-card">${barChart(result.competitors.slice(0, 10).map(row => [row.brand, (row.voice_share || row.mention_rate) * 100, 100]), "%")}</div>
+        <table><tr><th>品牌</th><th>AI 声量份额</th><th>出现率</th><th>平均排名</th><th>Top3率</th><th>场景题出现率</th><th>有效样本</th></tr>${competitors}</table>
         <h3>内容缺口</h3>
+        <p class="note">说明：内容缺口结合模型回答中的弱项、竞品上下文和 AI 个性化分析生成，用于指导官网、FAQ、对比页、案例页等内容建设。</p>
         <ul>${gaps}</ul>
         <h3>${suggestion.title}</h3>
+        <p class="note">GEO 优化建议说明：建议优先面向 AI 容易引用和总结的内容形态，例如结构化 FAQ、参数对比、权威来源、真实案例和清晰结论。</p>
         <p>${suggestion.action}</p>
         <pre>${suggestion.copyable_content}</pre>
         <h3>30 天任务提示词模板</h3>
@@ -194,6 +208,10 @@
 
     function escapeHtml(value) {
       return value.replace(/[&<>"']/g, char => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[char]));
+    }
+
+    function percent(value) {
+      return `${Math.round(Number(value || 0) * 100)}%`;
     }
   </script>
 </body>
