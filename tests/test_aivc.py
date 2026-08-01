@@ -3,16 +3,18 @@ from __future__ import annotations
 import asyncio
 import os
 import unittest
+from types import SimpleNamespace
 
 os.environ["AIVC_DISABLE_REAL_PROVIDERS"] = "1"
 os.environ["AIVC_DISABLE_WEB_RESEARCH"] = "1"
 
 from backend.aivc.cli import NIKE_REQUEST
 from backend.aivc.analysis.scoring import apply_competitive_voice_score, compute_visibility_score
-from backend.aivc.models import AuditRequest, BrandInput, BrandMentionAnalysis, CompetitorMetric, ProviderResponse, Question
+from backend.aivc.models import AuditRequest, BrandInput, BrandMentionAnalysis, Citation, CompetitorMetric, ProviderResponse, Question
 from backend.aivc.providers.base import ProviderClient, ProviderRegistry
 from backend.aivc.providers.simulated import ProviderProfile, SimulatedProvider
 from backend.aivc.analysis.recommendation import build_industry_benchmark_matrix
+from backend.aivc.report.citation_insights import build_citation_insights
 from backend.aivc.services.research_service import enrich_request
 from backend.aivc.question_generation import generate_questions
 from backend.aivc.services.audit_service import AuditService
@@ -32,8 +34,9 @@ class AIVCTestCase(unittest.TestCase):
             self.assertIsNotNone(record.result)
             result = record.result
             assert result is not None
-            self.assertEqual(len(result.questions), 60)
-            self.assertEqual(len(result.responses), 60 * 5)
+            self.assertEqual(len([q for q in result.questions if q.type.value != "citation_source"]), 60)
+            self.assertGreater(len(result.questions), 60)
+            self.assertEqual(len(result.responses), len(result.questions) * 5)
             self.assertGreater(result.score.total_score, 50)
             self.assertEqual(len(result.tasks), 30)
             self.assertTrue(result.geo_suggestions)
@@ -239,6 +242,48 @@ class AIVCTestCase(unittest.TestCase):
             self.assertIn("美的", brand.competitors)
 
         asyncio.run(run())
+
+    def test_citation_insights_counts_domains_urls_and_page_types(self) -> None:
+        response = ProviderResponse(
+            provider="test",
+            model_version="test",
+            question_id="q1",
+            question="test",
+            answer="参考 https://news.example.com/article/1 和 https://www.midea.com/product/a",
+            latency_ms=1,
+            token_count=10,
+            citations=[
+                Citation(title="美的产品页", url="https://www.midea.com/product/a", source_type="官网", authority=0.9),
+                Citation(title="行业新闻", url="https://news.example.com/article/1", source_type="新闻媒体", authority=0.7),
+            ],
+        )
+        result = SimpleNamespace(input=BrandInput(brand_name="美的", website="https://www.midea.com"), responses=[response])
+        insights = build_citation_insights(result)
+        self.assertEqual(insights.total, 2)
+        self.assertEqual(insights.unique_domains, 2)
+        self.assertEqual(insights.brand_citation_share, 0.5)
+        self.assertIn(("品牌官网", 1), insights.categories)
+        self.assertIn(("产品页", 1), insights.page_types)
+        self.assertIn(("midea.com", 1), insights.domains)
+
+    def test_citation_insights_extracts_bare_domains_and_named_sources(self) -> None:
+        response = ProviderResponse(
+            provider="test",
+            model_version="test",
+            question_id="q1",
+            question="test",
+            answer="可参考 midea.com 官网，也可以查看京东近期评价。",
+            latency_ms=1,
+            token_count=10,
+        )
+        result = SimpleNamespace(input=BrandInput(brand_name="美的", website="https://www.midea.com"), responses=[response])
+        insights = build_citation_insights(result)
+        self.assertEqual(insights.total, 2)
+        self.assertEqual(insights.unique_domains, 2)
+        self.assertEqual(insights.brand_citation_share, 0.5)
+        self.assertIn(("midea.com", 1), insights.domains)
+        self.assertIn(("jd.com", 1), insights.domains)
+        self.assertIn(("电商平台", 1), insights.categories)
 
 
 class FailingProvider(ProviderClient):

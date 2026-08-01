@@ -3,6 +3,7 @@ from __future__ import annotations
 import json
 import re
 from dataclasses import dataclass
+from urllib.parse import urlparse
 
 from ..models import AuditRequest, BrandInput, Question, QuestionType
 from ..providers.base import ProviderClient, ProviderRegistry
@@ -62,13 +63,15 @@ GENERIC_ITEMS = {"主要竞品", "替代品牌", "同类品牌", "竞争对手",
 
 
 async def enrich_request(request: AuditRequest, registry: ProviderRegistry) -> tuple[BrandInput, int, list[str]]:
-    research = await _research_with_ai(request, registry) if _needs_research(request) else None
-    research = research or _known_brand(request.brand_name) or _generic_research(request.brand_name)
+    ai_research = await _research_with_ai(request, registry) if _needs_research(request) else None
+    known_research = _known_brand(request.brand_name)
+    fallback_research = known_research or _generic_research(request.brand_name)
+    research = ai_research or fallback_research
 
-    website = request.website or research.website
-    industry = request.industry or research.industry
-    products = request.products or research.products
-    competitors = request.competitors or research.competitors
+    website = request.website or _clean_website(research.website) or _clean_website(fallback_research.website)
+    industry = request.industry or research.industry or fallback_research.industry
+    products = request.products or research.products or fallback_research.products
+    competitors = request.competitors or research.competitors or fallback_research.competitors
     industry_research = _industry_research(industry)
     if industry_research:
         if not products or _has_generic_items(products):
@@ -119,7 +122,7 @@ async def _research_with_ai(request: AuditRequest, registry: ProviderRegistry) -
         if not payload:
             return None
         return BrandResearch(
-            website=payload.get("website") or None,
+            website=_clean_website(payload.get("website")),
             industry=str(payload.get("industry") or "").strip(),
             products=_as_list(payload.get("products")),
             competitors=_as_list(payload.get("competitors")),
@@ -146,6 +149,22 @@ def _as_list(value: object) -> list[str]:
     if isinstance(value, str):
         return [item.strip() for item in re.split(r"[,，、\n]", value) if item.strip()]
     return []
+
+
+def _clean_website(value: object) -> str | None:
+    if value is None:
+        return None
+    text = str(value).strip()
+    if not text or text.lower() in {"待定", "未知", "无", "none", "null", "n/a", "na", "-"}:
+        return None
+    if text.startswith("www."):
+        text = f"https://{text}"
+    if "." in text and "://" not in text:
+        text = f"https://{text}"
+    parsed = urlparse(text)
+    if parsed.scheme not in {"http", "https"} or not parsed.netloc or "." not in parsed.netloc:
+        return None
+    return text
 
 
 def _known_brand(brand_name: str) -> BrandResearch | None:

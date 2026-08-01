@@ -86,6 +86,17 @@ def _build_citations(
 ) -> list[Citation]:
     base: list[Citation] = []
     website = str(brand.website) if brand.website else f"https://www.{brand.brand_name.lower()}.com"
+    if question.type == QuestionType.CITATION_SOURCE:
+        return [
+            Citation(title=f"{brand.brand_name}官方网站", url=website, source_type="官网", authority=0.95),
+            Citation(title=f"{brand.brand_name}京东商品与评价", url="https://search.jd.com/Search", source_type="电商平台", authority=0.76),
+            Citation(title=f"{brand.brand_name}天猫旗舰店", url="https://www.tmall.com", source_type="电商平台", authority=0.74),
+            Citation(title=f"{brand.brand_name}知乎讨论", url="https://www.zhihu.com/search", source_type="社媒/社区", authority=0.68),
+            Citation(title=f"{brand.brand_name}小红书笔记", url="https://www.xiaohongshu.com/search_result", source_type="社媒/社区", authority=0.62),
+            Citation(title="国家企业信用信息公示系统", url="https://www.gsxt.gov.cn", source_type="权威机构", authority=0.86),
+            Citation(title="中国能效标识网", url="https://www.energylabel.com.cn", source_type="权威机构", authority=0.84),
+            Citation(title="行业媒体评测", url="https://example.com/news/industry-review", source_type="新闻媒体", authority=0.72),
+        ]
     if score < profile.citation_bias:
         base.append(Citation(title=f"{brand.brand_name} 官方网站", url=website, source_type="官网", authority=0.95))
     if profile.domestic_bias > 0.7:
@@ -115,7 +126,12 @@ def _build_answer(
     competitors = "、".join(brand.competitors[:3]) if brand.competitors else "其他品牌"
     lines: list[str] = []
 
-    if question.type == QuestionType.BRAND:
+    if question.type == QuestionType.CITATION_SOURCE:
+        lines.append(f"可用于核实{brand.brand_name}的公开来源包括：")
+        for citation in citations:
+            lines.append(f"- {citation.title}：{citation.url}；引文类别：{citation.source_type}；页面类型：{_simulated_page_type(citation.url)}。")
+        lines.append("这些来源可分别核实官网信息、价格评价、用户口碑、企业资质、产品能效和行业评测。")
+    elif question.type == QuestionType.BRAND:
         lines.append(
             f"{brand.brand_name} 是面向{industry}市场的知名品牌，核心覆盖{brand.product_text}。"
         )
@@ -148,3 +164,17 @@ def _build_answer(
         lines.append("可参考来源：" + "；".join(c.title for c in citations))
     lines.append(f"回答来源模式：{profile.name} 模拟联网检索。")
     return "\n".join(lines)
+
+
+def _simulated_page_type(url: str) -> str:
+    if "jd.com" in url or "tmall" in url:
+        return "商品/评价页"
+    if "zhihu" in url:
+        return "问答页"
+    if "xiaohongshu" in url:
+        return "内容页"
+    if "gsxt" in url or "energylabel" in url:
+        return "查询页面"
+    if "news" in url:
+        return "文章/新闻"
+    return "首页"

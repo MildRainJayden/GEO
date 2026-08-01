@@ -8,7 +8,7 @@ from dataclasses import dataclass, field
 from urllib.error import HTTPError, URLError
 from urllib.request import Request, urlopen
 
-from ..models import BrandInput, Citation, ProviderResponse, Question
+from ..models import BrandInput, Citation, ProviderResponse, Question, QuestionType
 from .base import ProviderClient
 
 
@@ -81,6 +81,12 @@ class OpenAICompatibleProvider(ProviderClient):
         )
 
     def _chat_completion(self, question: Question, brand: BrandInput) -> dict:
+        source_instruction = (
+            "如果用户问题是在询问信息来源，请尽量用清单回答，每条包含：来源名称、完整网址、引文类别、页面类型、适合核实的信息。"
+            "不要只写平台名，能给域名或具体页面就给域名或具体页面。"
+            if question.type == QuestionType.CITATION_SOURCE
+            else ""
+        )
         payload = {
             "model": self.model_version,
             "messages": [
@@ -89,6 +95,7 @@ class OpenAICompatibleProvider(ProviderClient):
                     "content": (
                         "你是中国市场 AI 搜索可见度测评中的受测 AI。"
                         "请像真实用户搜索助手一样回答，客观、简洁，必要时列出推荐顺序。"
+                        f"{source_instruction}"
                     ),
                 },
                 {

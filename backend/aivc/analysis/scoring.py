@@ -144,11 +144,11 @@ def _platform_explanation(
     if accuracy_rate >= 0.7:
         strengths.append("品牌描述较准确")
     else:
-        risks.append("回答中行业或产品事实覆盖不够")
+        risks.append("行业或产品事实覆盖不够")
     if top3_rate < 0.15:
-        risks.append("推荐排序信号弱")
+        risks.append("同类推荐中的靠前度偏弱")
     if citation_quality == 0:
-        risks.append("API 未返回结构化引用")
+        risks.append("可被公开资料支撑的表达仍可加强")
 
     verdict = "表现较强" if score >= 75 else "表现中等" if score >= 55 else "需要重点优化"
     return f"{provider} {verdict}：" + "；".join([*(strengths[:2] or ["有基础曝光"]), *(risks[:2])]) + "。"

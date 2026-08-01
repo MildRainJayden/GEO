@@ -16,7 +16,7 @@ from ..models import AuditRecord, AuditRequest, AuditResult, BrandInput
 from ..models import ProviderResponse, Question
 from ..providers.base import ProviderClient, ProviderRegistry
 from ..providers.simulated import build_default_registry
-from ..question_generation import generate_questions
+from ..question_generation import generate_citation_source_questions, generate_questions
 from ..report.html import render_report_html
 from .research_service import enrich_request
 from .strategy_service import generate_personalized_strategy
@@ -46,7 +46,9 @@ class AuditService:
     async def run_audit(self, audit_id: str, request: AuditRequest) -> AuditResult:
         brand, question_count, provider_names = await enrich_request(request, self.registry)
         web_evidence = await collect_web_evidence(brand)
-        questions = generate_questions(brand, question_count)
+        visibility_questions = generate_questions(brand, question_count)
+        citation_questions = generate_citation_source_questions(brand, question_count)
+        questions = [*visibility_questions, *citation_questions]
         providers = self.registry.select(provider_names)
         responses, provider_errors = await _query_providers(providers, questions, brand)
         if not responses:
@@ -54,8 +56,10 @@ class AuditService:
             raise RuntimeError(f"All provider queries failed: {error_detail}")
         successful_provider_names = {response.provider for response in responses}
         successful_providers = [provider for provider in providers if provider.name in successful_provider_names]
-        analyses = [analyze_brand_response(response, brand) for response in responses]
-        score = compute_visibility_score(analyses, responses, len(successful_providers))
+        visibility_question_ids = {question.id for question in visibility_questions}
+        visibility_responses = [response for response in responses if response.question_id in visibility_question_ids]
+        analyses = [analyze_brand_response(response, brand) for response in visibility_responses]
+        score = compute_visibility_score(analyses, visibility_responses, len(successful_providers))
         citations = summarize_citations(responses)
         try:
             competitors = await build_industry_benchmark_matrix(brand, successful_providers)
@@ -63,7 +67,7 @@ class AuditService:
             competitors = []
         score = apply_competitive_voice_score(score, brand.brand_name, competitors)
         content_gaps, geo_suggestions, tasks = await generate_personalized_strategy(
-            brand, responses, analyses, score, successful_providers, web_evidence
+            brand, visibility_responses, analyses, score, successful_providers, web_evidence
         )
         predictions = predict_recommendation_probability(score)
         result = AuditResult(
@@ -79,6 +83,7 @@ class AuditService:
             geo_suggestions=geo_suggestions,
             recommendation_predictions=predictions,
             tasks=tasks,
+            evidence_notes=web_evidence,
         )
         result.report_html = render_report_html(result)
         return result

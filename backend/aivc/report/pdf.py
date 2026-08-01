@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from collections import defaultdict
 from pathlib import Path
 from xml.sax.saxutils import escape
 
@@ -13,7 +14,11 @@ from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.cidfonts import UnicodeCIDFont
 from reportlab.platypus import PageBreak, Paragraph, SimpleDocTemplate, Spacer, Table, TableStyle
 
-from ..models import AuditResult, CompetitorMetric
+from ..models import AuditResult, BrandMentionAnalysis, CompetitorMetric
+from .citation_insights import build_citation_insights
+
+
+PALETTE = ["#0f766e", "#2563eb", "#ca8a04", "#7c3aed", "#dc2626", "#0891b2", "#9333ea", "#64748b"]
 
 
 def write_pdf_report(result: AuditResult, output_path: str | Path) -> Path:
@@ -49,17 +54,7 @@ def write_pdf_report(result: AuditResult, output_path: str | Path) -> Path:
     story.append(Paragraph("数据图览", styles["HeadingCN"]))
     story.append(
         Table(
-            [
-                [
-                    _score_pie(result),
-                    _bar_drawing(
-                        [(p.provider, p.score) for p in result.score.platform_scores],
-                        "平台得分",
-                        84 * mm,
-                        48 * mm,
-                    ),
-                ]
-            ],
+            [[_score_pie(result), _bar_drawing([(p.provider, p.score) for p in result.score.platform_scores], "平台得分", 84 * mm, 48 * mm)]],
             colWidths=[76 * mm, 88 * mm],
         )
     )
@@ -72,25 +67,23 @@ def write_pdf_report(result: AuditResult, output_path: str | Path) -> Path:
         ["准确率", f"{result.score.accuracy_score}/30", "回答是否覆盖正确行业与产品事实。"],
         ["行业/产品覆盖", f"{result.score.industry_coverage_score}/20", "品牌相关产品词是否被覆盖。"],
         ["平台覆盖", f"{result.score.platform_coverage_score}/10", "成功测评的平台中是否均有品牌曝光。"],
-        ["竞争声量", f"{result.score.competitive_voice_score}/100", "品牌在行业基准竞品矩阵中的相对声量、排名、Top3表现。"],
+        ["竞争声量", f"{result.score.competitive_voice_score}/100", "品牌在行业基准对比中的相对声量、出现率和靠前度。"],
     ], [42 * mm, 28 * mm, 94 * mm], styles))
-    story.append(Paragraph("说明：最终总分 = 基础可见度 70% + 竞争声量 30%。当品牌自身问题表现好、但行业声量份额低时，总分会被拉低。", styles["NoteCN"]))
+    story.append(Paragraph("说明：总分由品牌自身可见度和行业竞争声量共同组成。自身问题回答得好但行业对比中出现少，总分会被竞争声量拉低。", styles["NoteCN"]))
 
     story.append(Paragraph("平台表现", styles["HeadingCN"]))
-    story.append(Paragraph("说明：平台得分按单个模型的回答单独计算；多模型总分聚合所有成功模型的回答。", styles["NoteCN"]))
+    story.append(Paragraph("说明：平台得分用于观察不同 AI 引擎对品牌的熟悉度和回答稳定性；多模型总分会综合所有成功返回的平台结果。", styles["NoteCN"]))
     platform_data = [["平台", "评分", "提及率", "准确率", "中文解释"]]
     for p in result.score.platform_scores:
         platform_data.append([p.provider, p.score, f"{p.mention_rate:.0%}", f"{p.accuracy_rate:.0%}", p.explanation])
     story.append(_table(platform_data, [24 * mm, 20 * mm, 22 * mm, 22 * mm, 76 * mm], styles))
 
-    story.append(Paragraph("行业基准竞品矩阵", styles["HeadingCN"]))
-    story.append(Paragraph("说明：AI 声量份额是候选品牌在行业基准回答中的排名加权份额；出现率表示有效回答中有多少比例提到该品牌；平均排名越小越靠前；Top3率表示进入前三的比例；场景题出现率只统计场景类问题。0 表示本轮有效样本未提及。", styles["NoteCN"]))
+    story.append(Paragraph("AI 声量份额", styles["HeadingCN"]))
+    story.append(Paragraph("说明：AI 声量份额表示在同一行业的中立推荐与对比问题中，AI 更常把哪些品牌放到靠前位置。它不是销量或市场份额，而是 AI 回答里的被看见程度。", styles["NoteCN"]))
     story.append(
-        _bar_drawing(
-            [(c.brand, (c.voice_share or c.mention_rate) * 100) for c in result.competitors[:10]],
-            "AI 声量份额",
-            160 * mm,
-            62 * mm,
+        Table(
+            [[_voice_pie(result.competitors[:8]), Paragraph(_voice_explanation(result), styles["NoteCN"])]],
+            colWidths=[78 * mm, 86 * mm],
         )
     )
     story.append(Spacer(1, 6))
@@ -99,16 +92,22 @@ def write_pdf_report(result: AuditResult, output_path: str | Path) -> Path:
         competitor_data.append(_competitor_row(c))
     story.append(_table(competitor_data, [34 * mm, 22 * mm, 22 * mm, 22 * mm, 20 * mm, 20 * mm, 24 * mm], styles))
 
+    story.append(Paragraph("引用来源", styles["HeadingCN"]))
+    story.append(Paragraph("查看大语言模型在回答本次问题时引用、写出或明确提到的来源。这里统计引文类别、引文页面类型、被引最多的域名和网址，帮助判断 AI 更信任哪些内容入口。", styles["NoteCN"]))
+    story.extend(_citation_story(result, styles))
+
     story.append(PageBreak())
     story.append(Paragraph("内容缺口", styles["HeadingCN"]))
-    story.append(Paragraph("说明：内容缺口结合模型回答中的弱项、竞品上下文和 AI 个性化分析生成，用于指导官网、FAQ、对比页、案例页等内容建设。", styles["NoteCN"]))
+    story.append(Paragraph("说明：内容缺口由本次 AI 回答中暴露的弱项、竞品上下文和个性化分析生成，用于指导官网、FAQ、对比页、案例页等内容建设。", styles["NoteCN"]))
     gap_data = [["优先级", "问题", "建议类型", "原因"]]
     for gap in result.content_gaps:
         gap_data.append([gap.priority, gap.question, gap.recommendation_type, gap.reason])
     story.append(_table(gap_data, [18 * mm, 62 * mm, 24 * mm, 60 * mm], styles))
 
     story.append(Paragraph("GEO 优化建议", styles["HeadingCN"]))
-    story.append(Paragraph("说明：建议优先面向 AI 容易引用和总结的内容形态，例如结构化 FAQ、参数对比、权威来源、真实案例和清晰结论。", styles["NoteCN"]))
+    story.append(Paragraph("说明：建议优先补充 AI 容易摘取和引用的内容，例如清晰结论、参数表、FAQ、真实案例、竞品对比和权威来源。", styles["NoteCN"]))
+    story.append(Paragraph("不同 AI 平台的优化重点", styles["HeadingCN"]))
+    story.append(_table(_model_geo_rows(result), [26 * mm, 56 * mm, 82 * mm], styles, font_size=7))
     suggestion_data = [["类别", "标题", "动作"]]
     for suggestion in result.geo_suggestions:
         suggestion_data.append([suggestion.category, suggestion.title, suggestion.action])
@@ -175,6 +174,70 @@ def _footer(font_name: str):
     return draw
 
 
+def _citation_story(result: AuditResult, styles: dict[str, ParagraphStyle]) -> list:
+    insights = build_citation_insights(result)
+    story: list = []
+    story.append(
+        _table(
+            [
+                ["指标", "数值", "说明"],
+                ["品牌官网引用占比", f"{insights.brand_citation_share:.0%}", "模型引用中指向品牌官网域名的比例。"],
+                ["唯一域名", insights.unique_domains, "被引用来源覆盖的不同域名数量。"],
+                ["来源出现次数", insights.total, "模型返回、写出或明确提到的可识别来源出现次数。"],
+            ],
+            [42 * mm, 28 * mm, 94 * mm],
+            styles,
+        )
+    )
+    if insights.total == 0:
+        story.append(Paragraph("本轮模型未返回可解析的引用链接。若要看到更完整的引用来源，可接入支持联网引用的模型，或补充公开搜索数据源。", styles["NoteCN"]))
+        return story
+    story.append(
+        Table(
+            [
+                [
+                    _count_pie(insights.categories, "引文类别", 78 * mm, 48 * mm),
+                    _count_pie(insights.page_types, "引文页面类型", 86 * mm, 48 * mm),
+                ]
+            ],
+            colWidths=[78 * mm, 86 * mm],
+        )
+    )
+    story.append(Spacer(1, 6))
+    story.append(_table(_count_rows("域名", insights.domains[:8]), [112 * mm, 52 * mm], styles))
+    story.append(_table(_count_rows("网址", _short_count_urls(insights.urls[:8])), [132 * mm, 32 * mm], styles, font_size=7))
+    provider_rows: list[list[object]] = [["模型", "来源出现次数", "唯一域名", "官网占比", "主要被引域名"]]
+    for item in insights.providers:
+        provider_rows.append([
+            item.provider,
+            item.total,
+            item.unique_domains,
+            f"{item.brand_citation_share:.0%}",
+            "、".join(name for name, _count in item.domains[:3]) or "暂无",
+        ])
+    story.append(Paragraph("各模型引用来源表现", styles["HeadingCN"]))
+    story.append(_table(provider_rows, [24 * mm, 28 * mm, 24 * mm, 24 * mm, 64 * mm], styles, font_size=7))
+    return story
+
+
+def _count_rows(label: str, items: list[tuple[str, int]]) -> list[list[object]]:
+    rows: list[list[object]] = [[label, "引用次数"]]
+    rows.extend([[name, count] for name, count in items])
+    return rows
+
+
+def _short_count_urls(items: list[tuple[str, int]]) -> list[tuple[str, int]]:
+    return [(url if len(url) <= 90 else f"{url[:87]}...", count) for url, count in items]
+
+
+def _count_pie(items: list[tuple[str, int]], title: str, width: float, height: float) -> Drawing:
+    labels = [
+        (label, count, PALETTE[index % len(PALETTE)])
+        for index, (label, count) in enumerate(items[:6])
+    ]
+    return _pie_drawing(labels, title, width, height)
+
+
 def _competitor_row(metric: CompetitorMetric) -> list[object]:
     avg_rank = f"{metric.average_rank:.2f}" if metric.average_rank is not None else "-"
     return [
@@ -188,48 +251,130 @@ def _competitor_row(metric: CompetitorMetric) -> list[object]:
     ]
 
 
+def _model_geo_rows(result: AuditResult) -> list[list[object]]:
+    analysis_by_provider: dict[str, list[BrandMentionAnalysis]] = defaultdict(list)
+    for analysis in result.analyses:
+        analysis_by_provider[analysis.provider].append(analysis)
+    rows: list[list[object]] = [["平台", "本轮观察", "优化重点"]]
+    for platform in result.score.platform_scores:
+        analyses = analysis_by_provider.get(platform.provider, [])
+        weak_count = sum(
+            1
+            for analysis in analyses
+            if not analysis.brand_mentioned or not analysis.description_correct or not analysis.industry_terms_covered
+        )
+        issue = _model_issue(platform.mention_rate, platform.accuracy_rate, weak_count, len(analyses))
+        rows.append([platform.provider, issue, _model_action(platform.provider, issue)])
+    return rows
+
+
+def _model_issue(mention_rate: float, accuracy_rate: float, weak_count: int, total: int) -> str:
+    if mention_rate < 0.6:
+        return "品牌在回答中出现不够稳定"
+    if accuracy_rate < 0.7:
+        return "产品和品牌事实需要更清晰"
+    if total and weak_count / total > 0.3:
+        return "部分场景问题下表达不够完整"
+    return "表现相对稳定，可继续扩大覆盖"
+
+
+def _model_action(provider: str, issue: str) -> str:
+    if issue == "品牌在回答中出现不够稳定":
+        return f"优先建设适合 {provider} 抽取的品牌介绍、核心品类页、购买场景页和竞品对比页。"
+    if issue == "产品和品牌事实需要更清晰":
+        return f"补充参数表、型号清单、售后政策、适用人群和高频 FAQ，让 {provider} 更容易形成准确回答。"
+    if issue == "部分场景问题下表达不够完整":
+        return f"围绕 {provider} 容易触发的场景问题补案例、问答和对比结论，提升长尾问题中的推荐稳定性。"
+    return f"维持 {provider} 已有表现，继续扩展行业场景、竞品比较和权威背书内容。"
+
+
 def _summary_text(result: AuditResult) -> str:
     brand = result.input.brand_name
     leader = result.competitors[0].brand if result.competitors else "暂无竞品数据"
     brand_metric = next((item for item in result.competitors if item.brand == brand), None)
     share = f"{(brand_metric.voice_share or brand_metric.mention_rate):.0%}" if brand_metric else "暂无"
-    return f"{brand} 本轮 AI 可见度总分为 {result.score.total_score}，其中基础可见度为 {result.score.base_visibility_score}，竞争声量分为 {result.score.competitive_voice_score}。行业基准竞品矩阵中，当前声量领先品牌为 {leader}；{brand} 的 AI 声量份额为 {share}。"
+    return f"{brand} 本轮 AI 可见度总分为 {result.score.total_score}。行业对比中，当前 AI 声量领先品牌为 {leader}；{brand} 的 AI 声量份额为 {share}。建议优先提升行业推荐问题中的出现率和靠前度，并补充可被 AI 摘取的产品事实、场景问答与竞品对比内容。"
+
+
+def _voice_explanation(result: AuditResult) -> str:
+    brand = result.input.brand_name
+    leader = result.competitors[0] if result.competitors else None
+    own = next((item for item in result.competitors if item.brand == brand), None)
+    if not leader or not own:
+        return "本轮有效行业对比样本不足，建议扩大问题数量或接入更多 AI 平台后再观察声量变化。"
+    if own.brand == leader.brand:
+        return f"{brand} 在本轮行业对比中处于领先位置，说明 AI 更容易把它作为同类品牌的优先候选。但仍需关注出现率和平均排名，避免只在少数问题里集中出现。"
+    gap = max(leader.voice_share - own.voice_share, 0)
+    return f"{brand} 当前声量低于 {leader.brand}，差距约 {gap:.0%}。这通常意味着 AI 在回答同类推荐时更先想到竞品，后续应补强行业场景内容、对比页和权威来源。"
 
 
 def _score_pie(result: AuditResult) -> Drawing:
-    drawing = Drawing(70 * mm, 48 * mm)
-    pie = Pie()
-    pie.x = 0
-    pie.y = 6
-    pie.width = 35 * mm
-    pie.height = 35 * mm
     values = [
         result.score.mention_rate_score,
         result.score.accuracy_score,
         result.score.industry_coverage_score,
         result.score.platform_coverage_score,
     ]
-    pie.data = [max(value, 0.01) for value in values]
-    palette = [
-        colors.HexColor("#0f766e"),
-        colors.HexColor("#2563eb"),
-        colors.HexColor("#ca8a04"),
-        colors.HexColor("#7c3aed"),
+    labels = [
+        ("品牌提及", values[0], PALETTE[0]),
+        ("准确率", values[1], PALETTE[1]),
+        ("行业覆盖", values[2], PALETTE[2]),
+        ("平台覆盖", values[3], PALETTE[3]),
     ]
-    for index, color in enumerate(palette):
-        pie.slices[index].fillColor = color
+    return _pie_drawing(labels, "评分构成", 70 * mm, 48 * mm)
+
+
+def _voice_pie(metrics: list[CompetitorMetric]) -> Drawing:
+    labels = [
+        (metric.brand, (metric.voice_share or metric.mention_rate) * 100, PALETTE[index % len(PALETTE)])
+        for index, metric in enumerate(metrics[:6])
+    ]
+    return _pie_drawing(labels, "AI 声量份额", 76 * mm, 54 * mm)
+
+
+def _pie_drawing(items: list[tuple[str, float, str]], title: str, width: float, height: float) -> Drawing:
+    drawing = Drawing(width, height)
+    drawing.add(String(0, height - 8, title, fontName="STSong-Light", fontSize=8, fillColor=colors.HexColor("#1d2733")))
+    if not items:
+        drawing.add(String(0, height - 20, "暂无数据", fontName="STSong-Light", fontSize=7, fillColor=colors.HexColor("#667085")))
+        return drawing
+    pie = Pie()
+    pie.x = 0
+    pie.y = 6
+    pie.width = 34 * mm
+    pie.height = 34 * mm
+    pie.data = [max(value, 0.01) for _, value, _ in items]
+    for index, (_, _, color) in enumerate(items):
+        pie.slices[index].fillColor = colors.HexColor(color)
         pie.slices[index].strokeColor = colors.white
     drawing.add(pie)
-    labels = [
-        ("品牌提及", values[0], "#0f766e"),
-        ("准确率", values[1], "#2563eb"),
-        ("行业覆盖", values[2], "#ca8a04"),
-        ("平台覆盖", values[3], "#7c3aed"),
-    ]
-    for index, (label, value, color) in enumerate(labels):
-        y = 34 * mm - index * 8 * mm
-        drawing.add(Rect(42 * mm, y - 2, 4 * mm, 4 * mm, fillColor=colors.HexColor(color), strokeColor=None))
-        drawing.add(String(48 * mm, y - 1, f"{label} {value:.1f}", fontName="STSong-Light", fontSize=7, fillColor=colors.HexColor("#1d2733")))
+    for index, (label, value, color) in enumerate(items[:6]):
+        y = height - 20 - index * 7 * mm
+        drawing.add(Rect(40 * mm, y - 2, 4 * mm, 4 * mm, fillColor=colors.HexColor(color), strokeColor=None))
+        drawing.add(String(46 * mm, y - 1, f"{label[:8]} {value:.0f}", fontName="STSong-Light", fontSize=6.5, fillColor=colors.HexColor("#1d2733")))
+    return drawing
+
+
+def _count_bar_drawing(items: list[tuple[str, int]], title: str, width: float, height: float) -> Drawing:
+    drawing = Drawing(width, height)
+    drawing.add(String(0, height - 8, title, fontName="STSong-Light", fontSize=8, fillColor=colors.HexColor("#1d2733")))
+    if not items:
+        drawing.add(String(0, height - 20, "暂无数据", fontName="STSong-Light", fontSize=7, fillColor=colors.HexColor("#667085")))
+        return drawing
+    max_value = max(max(count for _, count in items), 1)
+    label_w = min(32 * mm, width * 0.34)
+    value_w = 14 * mm
+    bar_w = width - label_w - value_w - 4 * mm
+    row_h = min(7 * mm, (height - 12) / max(len(items), 1))
+    for index, (label, count) in enumerate(items[:6]):
+        y = height - 20 - index * row_h
+        if y < 2:
+            break
+        color = colors.HexColor(PALETTE[index % len(PALETTE)])
+        drawing.add(String(0, y + 1, label[:10], fontName="STSong-Light", fontSize=6.5, fillColor=colors.HexColor("#425466")))
+        drawing.add(Rect(label_w, y, bar_w, 4 * mm, fillColor=colors.HexColor("#edf3f8"), strokeColor=None))
+        drawing.add(Rect(label_w, y, bar_w * (count / max_value), 4 * mm, fillColor=color, strokeColor=None))
+        drawing.add(String(label_w + bar_w + 2 * mm, y + 1, str(count), fontName="STSong-Light", fontSize=6.5, fillColor=colors.HexColor("#1d2733")))
     return drawing
 
 
@@ -248,8 +393,9 @@ def _bar_drawing(items: list[tuple[str, float]], title: str, width: float, heigh
         y = height - 20 - index * row_h
         if y < 2:
             break
+        color = colors.HexColor(PALETTE[index % len(PALETTE)])
         drawing.add(String(0, y + 1, label[:12], fontName="STSong-Light", fontSize=6.5, fillColor=colors.HexColor("#425466")))
         drawing.add(Rect(label_w, y, bar_w, 4.2 * mm, fillColor=colors.HexColor("#edf3f8"), strokeColor=None))
-        drawing.add(Rect(label_w, y, bar_w * (value / max_value), 4.2 * mm, fillColor=colors.HexColor("#0f766e"), strokeColor=None))
+        drawing.add(Rect(label_w, y, bar_w * (value / max_value), 4.2 * mm, fillColor=color, strokeColor=None))
         drawing.add(String(label_w + bar_w + 2 * mm, y + 1, f"{value:.0f}", fontName="STSong-Light", fontSize=6.5, fillColor=colors.HexColor("#1d2733")))
     return drawing

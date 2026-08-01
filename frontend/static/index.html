@@ -11,8 +11,6 @@
     h1 { margin: 0; font-size: 22px; letter-spacing: 0; }
     main { padding: 24px 5vw 48px; display: grid; grid-template-columns: 360px 1fr; gap: 20px; }
     label { display: block; font-size: 13px; font-weight: 700; margin: 12px 0 6px; }
-    .check { display: flex; align-items: center; gap: 8px; margin-top: 12px; font-weight: 700; font-size: 13px; }
-    .check input { width: auto; }
     input, textarea, select { width: 100%; box-sizing: border-box; border: 1px solid #cbd5e1; border-radius: 6px; padding: 10px 12px; font: inherit; background: white; }
     textarea { min-height: 76px; resize: vertical; }
     button { margin-top: 14px; border: 0; border-radius: 6px; padding: 11px 14px; background: #0f766e; color: white; font-weight: 800; cursor: pointer; }
@@ -22,10 +20,17 @@
     .metric { border: 1px solid #e2e8f0; border-radius: 8px; padding: 14px; background: #fbfdff; }
     .metric strong { display: block; font-size: 28px; margin-top: 4px; }
     table { width: 100%; border-collapse: collapse; margin-top: 12px; }
-    th, td { border-bottom: 1px solid #e5eaf0; padding: 9px 8px; text-align: left; font-size: 14px; }
+    th, td { border-bottom: 1px solid #e5eaf0; padding: 9px 8px; text-align: left; font-size: 14px; vertical-align: top; }
     th { background: #edf3f8; }
+    td a { color: #0f766e; word-break: break-all; }
     pre { background: #111827; color: #e5e7eb; border-radius: 6px; padding: 12px; white-space: pre-wrap; overflow: auto; }
     .chart-grid { display: grid; grid-template-columns: minmax(240px, .9fr) minmax(320px, 1.1fr); gap: 14px; margin: 16px 0; }
+    .voice-grid { display: grid; grid-template-columns: minmax(260px, .78fr) minmax(320px, 1.22fr); gap: 14px; margin: 16px 0; }
+    .citation-grid { display: grid; grid-template-columns: repeat(3, minmax(160px, 1fr)); gap: 14px; margin: 14px 0 18px; }
+    .citation-card { border: 1px solid #d9e2ec; border-radius: 8px; padding: 16px; background: white; box-shadow: 0 1px 3px rgba(16, 24, 40, .06); }
+    .citation-card span { color: #64748b; font-size: 13px; }
+    .citation-card strong { display: block; font-size: 34px; margin-top: 18px; }
+    .citation-panels { display: grid; grid-template-columns: repeat(2, minmax(280px, 1fr)); gap: 14px; }
     .chart-card { border: 1px solid #d9e2ec; border-radius: 8px; padding: 14px; background: #fbfdff; }
     .chart-card h3 { margin-top: 0; }
     .note { color: #64748b; font-size: 13px; line-height: 1.7; }
@@ -33,9 +38,9 @@
     svg.chart { width: 100%; height: auto; overflow: visible; }
     .legend { display: grid; gap: 7px; font-size: 13px; margin-top: 10px; }
     .legend span { display: inline-flex; align-items: center; gap: 8px; }
-    .swatch { width: 11px; height: 11px; border-radius: 3px; display: inline-block; }
+    .swatch { width: 11px; height: 11px; border-radius: 3px; display: inline-block; flex: 0 0 auto; }
     @media (max-width: 900px) { main { grid-template-columns: 1fr; } }
-    @media (max-width: 720px) { .chart-grid { grid-template-columns: 1fr; } }
+    @media (max-width: 720px) { .chart-grid, .voice-grid, .citation-grid, .citation-panels { grid-template-columns: 1fr; } }
   </style>
 </head>
 <body>
@@ -78,6 +83,7 @@
     const button = document.getElementById("runButton");
     const statusBox = document.getElementById("status");
     const resultBox = document.getElementById("result");
+    const palette = ["#0f766e", "#2563eb", "#ca8a04", "#7c3aed", "#dc2626", "#0891b2", "#9333ea", "#64748b"];
 
     form.addEventListener("submit", async (event) => {
       event.preventDefault();
@@ -112,46 +118,52 @@
     });
 
     function renderResult(result, id) {
-      const platforms = result.score.platform_scores.map(row => `<tr><td>${row.provider}</td><td>${row.score}</td><td>${Math.round(row.mention_rate * 100)}%</td><td>${Math.round(row.accuracy_rate * 100)}%</td><td>${row.explanation || ""}</td></tr>`).join("");
+      const platforms = result.score.platform_scores.map(row => `<tr><td>${escapeHtml(row.provider)}</td><td>${row.score}</td><td>${Math.round(row.mention_rate * 100)}%</td><td>${Math.round(row.accuracy_rate * 100)}%</td><td>${escapeHtml(row.explanation || "")}</td></tr>`).join("");
       const competitors = result.competitors.slice(0, 8).map(row => `<tr><td>${escapeHtml(row.brand)}</td><td>${percent(row.voice_share || row.mention_rate)}</td><td>${percent(row.occurrence_rate || row.accuracy_rate)}</td><td>${row.average_rank ? Number(row.average_rank).toFixed(2) : "-"}</td><td>${percent(row.top3_rate)}</td><td>${percent(row.scenario_coverage)}</td><td>${row.effective_sample_count || "-"}</td></tr>`).join("");
-      const gaps = result.content_gaps.map(gap => `<li><strong>${gap.priority}</strong> ${gap.question}：${gap.reason}</li>`).join("");
-      const suggestion = result.geo_suggestions[0];
-      const taskPrompts = result.tasks.slice(0, 5).map(task => `<details><summary>Day ${task.day} ${task.title}</summary><pre>${task.prompt_template || ""}</pre></details>`).join("");
+      const gaps = result.content_gaps.map(gap => `<li><strong>${escapeHtml(gap.priority)}</strong> ${escapeHtml(gap.question)}：${escapeHtml(gap.reason)}</li>`).join("");
+      const suggestion = result.geo_suggestions[0] || { title: "GEO 优化建议", action: "", copyable_content: "" };
+      const taskPrompts = result.tasks.slice(0, 5).map(task => `<details><summary>Day ${task.day} ${escapeHtml(task.title)}</summary><pre>${escapeHtml(task.prompt_template || "")}</pre></details>`).join("");
       const leader = result.competitors[0]?.brand || "暂无竞品数据";
       const own = result.competitors.find(row => row.brand === result.input.brand_name);
       const ownShare = own ? percent(own.voice_share || own.mention_rate) : "暂无";
       resultBox.innerHTML = `
         <section class="summary">
           <h3>报告总结</h3>
-          <p>${escapeHtml(result.input.brand_name)} 本轮 AI 可见度总分为 ${result.score.total_score}，其中基础可见度为 ${result.score.base_visibility_score || result.score.total_score}，竞争声量分为 ${result.score.competitive_voice_score || 0}。行业基准竞品矩阵中，当前声量领先品牌为 ${escapeHtml(leader)}；${escapeHtml(result.input.brand_name)} 的 AI 声量份额为 ${ownShare}。</p>
+          <p>${escapeHtml(result.input.brand_name)} 本轮 AI 可见度总分为 ${result.score.total_score}。行业对比中，当前 AI 声量领先品牌为 ${escapeHtml(leader)}；${escapeHtml(result.input.brand_name)} 的 AI 声量份额为 ${ownShare}。</p>
         </section>
         <div class="grid">
           <div class="metric">总分<strong>${result.score.total_score}</strong></div>
-          <div class="metric">问题<strong>${result.questions.length}</strong></div>
-          <div class="metric">回答<strong>${result.responses.length}</strong></div>
+          <div class="metric">基础可见度<strong>${result.score.base_visibility_score || result.score.total_score}</strong></div>
           <div class="metric">竞争声量<strong>${result.score.competitive_voice_score || 0}</strong></div>
         </div>
-        <p class="note">核心评分说明：基础可见度由品牌提及、描述准确率、行业/产品覆盖、平台覆盖计算；最终总分 = 基础可见度 70% + 竞争声量 30%。竞争声量来自行业基准竞品矩阵，因此当品牌自身问题表现好、但行业声量份额低时，总分会被拉低。</p>
+        <p class="note">评分说明：总分由品牌自身可见度和行业竞争声量共同组成。自身问题回答得好但行业对比中出现少，总分会被竞争声量拉低。</p>
         <h3>自动补全信息</h3>
-        <p>${result.input.industry || "未识别行业"} · ${result.input.product_text}</p>
+        <p>${escapeHtml(result.input.industry || "未识别行业")} · ${escapeHtml(result.input.product_text || "")}</p>
         <div class="chart-grid">
           <div class="chart-card"><h3>评分构成</h3>${scorePie(result)}</div>
           <div class="chart-card"><h3>平台得分</h3>${barChart(result.score.platform_scores.map(row => [row.provider, row.score, 100]), "")}</div>
         </div>
         <h3>平台表现</h3>
-        <p class="note">说明：平台得分按单个模型的回答单独计算；多模型总分聚合所有成功模型的回答。</p>
+        <p class="note">说明：平台得分用于观察不同 AI 引擎对品牌的熟悉度和回答稳定性；多模型总分会综合所有成功返回的平台结果。</p>
         <table><tr><th>平台</th><th>评分</th><th>提及率</th><th>准确率</th><th>解释</th></tr>${platforms}</table>
-        <h3>行业基准竞品矩阵</h3>
-        <p class="note">说明：AI 声量份额是候选品牌在行业基准回答中的排名加权份额，整张表加总约 100%；出现率表示有效回答中有多少比例提到该品牌；平均排名越小越靠前；Top3率表示进入前三的比例；场景题出现率只统计场景类问题。0 通常表示本轮有效样本未提及，不代表品牌没有真实市场影响力。</p>
-        <div class="chart-card">${barChart(result.competitors.slice(0, 10).map(row => [row.brand, (row.voice_share || row.mention_rate) * 100, 100]), "%")}</div>
+        <h3>AI 声量份额</h3>
+        <p class="note">说明：AI 声量份额表示在同一行业的中立推荐与对比问题中，AI 更常把哪些品牌放到靠前位置。它不是销量或市场份额，而是 AI 回答里的被看见程度。</p>
+        <div class="voice-grid">
+          <div class="chart-card"><h3>声量占比</h3>${voiceSharePie(result.competitors.slice(0, 8))}</div>
+          <div class="chart-card"><h3>如何理解</h3><p>${escapeHtml(voiceExplanation(result))}</p></div>
+        </div>
         <table><tr><th>品牌</th><th>AI 声量份额</th><th>出现率</th><th>平均排名</th><th>Top3率</th><th>场景题出现率</th><th>有效样本</th></tr>${competitors}</table>
+        ${citationSection(result)}
         <h3>内容缺口</h3>
-        <p class="note">说明：内容缺口结合模型回答中的弱项、竞品上下文和 AI 个性化分析生成，用于指导官网、FAQ、对比页、案例页等内容建设。</p>
+        <p class="note">说明：内容缺口由本次 AI 回答中暴露的弱项、竞品上下文和个性化分析生成，用于指导官网、FAQ、对比页、案例页等内容建设。</p>
         <ul>${gaps}</ul>
-        <h3>${suggestion.title}</h3>
-        <p class="note">GEO 优化建议说明：建议优先面向 AI 容易引用和总结的内容形态，例如结构化 FAQ、参数对比、权威来源、真实案例和清晰结论。</p>
-        <p>${suggestion.action}</p>
-        <pre>${suggestion.copyable_content}</pre>
+        <h3>不同 AI 平台的优化重点</h3>
+        <p class="note">说明：不同 AI 平台对官网、媒体稿、问答内容和对比内容的吸收偏好不同。这里给出的是客户可执行的内容建设方向。</p>
+        <table><tr><th>平台</th><th>本轮观察</th><th>优化重点</th></tr>${modelGeoDiagnosisRows(result)}</table>
+        <h3>${escapeHtml(suggestion.title)}</h3>
+        <p class="note">GEO 优化建议说明：建议优先补充 AI 容易摘取和引用的内容，例如清晰结论、参数表、FAQ、真实案例、竞品对比和权威来源。</p>
+        <p>${escapeHtml(suggestion.action)}</p>
+        <pre>${escapeHtml(suggestion.copyable_content)}</pre>
         <h3>30 天任务提示词模板</h3>
         ${taskPrompts}
         <p><a href="/audit/${id}/report" target="_blank" rel="noreferrer">打开 HTML 报告</a></p>
@@ -159,30 +171,274 @@
       `;
     }
 
-    function scorePie(result) {
-      const parts = [
-        ["品牌提及", result.score.mention_rate_score, 40, "#0f766e"],
-        ["准确率", result.score.accuracy_score, 30, "#2563eb"],
-        ["行业/产品覆盖", result.score.industry_coverage_score, 20, "#ca8a04"],
-        ["平台覆盖", result.score.platform_coverage_score, 10, "#7c3aed"],
-      ];
+    function citationSection(result) {
+      const insights = citationInsights(result);
+      const providerRows = insights.providers.map(item => `<tr><td>${escapeHtml(item.provider)}</td><td>${item.total}</td><td>${item.uniqueDomains}</td><td>${percent(item.brandShare)}</td><td>${escapeHtml(item.domains.slice(0, 3).map(row => row[0]).join("、") || "暂无")}</td></tr>`).join("");
+      const empty = insights.total === 0 ? `<p class="note">本轮模型未返回可解析的引用链接。若要看到更完整的引用来源，可接入支持联网引用的模型，或补充公开搜索数据源。</p>` : "";
+      return `<h3>引用来源</h3>
+        <p class="note">查看大语言模型在回答本次问题时引用、写出或明确提到的来源。本轮会额外加入来源探测问题，让模型列出它判断品牌、产品、口碑、参数、售后和竞品时会参考的公开网站；这些样本只用于引用来源，不参与总分计算。若品牌官网引用占比为 0，表示本轮可见来源更多指向第三方平台、媒体、社区或权威机构，模型没有明显把官网作为可引用入口。</p>
+        <div class="citation-grid">
+          <div class="citation-card"><span>品牌官网引用占比</span><strong>${percent(insights.brandShare)}</strong></div>
+          <div class="citation-card"><span>唯一域名数</span><strong>${insights.uniqueDomains}</strong></div>
+          <div class="citation-card"><span>来源出现次数</span><strong>${insights.total}</strong></div>
+        </div>
+        ${empty}
+        <div class="citation-panels">
+          <div class="chart-card"><h3>引文类别</h3>${distributionChart(insights.categories, "引文类别")}</div>
+          <div class="chart-card"><h3>引文页面类型</h3>${distributionChart(insights.pageTypes, "引文页面类型")}</div>
+          <div class="chart-card"><h3>被引最多的域名</h3>${countTable(insights.domains, "域名")}</div>
+          <div class="chart-card"><h3>被引用次数最多的网址</h3>${urlTable(insights.urls)}</div>
+        </div>
+        <div class="chart-card">
+          <h3>各模型引用来源表现</h3>
+          <p class="note">用于观察不同模型更倾向参考官网、平台、媒体、社区还是权威机构；后续同时接入多个模型时，这里会按模型分别展示。</p>
+          <table><tr><th>模型</th><th>来源出现次数</th><th>唯一域名数</th><th>官网占比</th><th>主要被引域名</th></tr>${providerRows}</table>
+        </div>`;
+    }
+
+    function citationInsights(result) {
+      const records = [];
+      result.responses.forEach(response => {
+        const seen = new Set();
+        (response.citations || []).forEach(citation => {
+          const url = cleanUrl(citation.url);
+          const domain = domainOf(url);
+          const key = `url|${url.toLowerCase()}`;
+          if (!url || seen.has(key)) return;
+          seen.add(key);
+          records.push({ provider: response.provider, url, domain, category: normalizeCategory(citation.source_type, domain), pageType: pageType(url, citation.title || "") });
+        });
+        String(response.answer || "").match(/https?:\/\/[^\s<>)"'`，。；、（）]+/gi)?.forEach(raw => {
+          const url = cleanUrl(raw);
+          const domain = domainOf(url);
+          const key = `url|${url.toLowerCase()}`;
+          if (!url || (domain && !looksLikeDomain(domain)) || seen.has(key)) return;
+          seen.add(key);
+          records.push({ provider: response.provider, url, domain, category: categoryFromDomain(domain), pageType: pageType(url, "") });
+        });
+        String(response.answer || "").replace(/https?:\/\/[^\s<>)"'`，。；、（）]+/gi, " ").match(/(?<!@)\b(?:www\.)?[a-z0-9-]+(?:\.[a-z0-9-]+)+\b/gi)?.forEach(raw => {
+          if (!looksLikeDomain(raw)) return;
+          const url = `https://${raw}`;
+          const domain = domainOf(url);
+          const key = `url|${url.toLowerCase()}`;
+          if (!domain || seen.has(key)) return;
+          seen.add(key);
+          records.push({ provider: response.provider, url, domain, category: categoryFromDomain(domain), pageType: pageType(url, "") });
+        });
+        knownSources().forEach(([name, domain, category, pageTypeValue]) => {
+          if (!String(response.answer || "").includes(name)) return;
+          if (seenDomain(seen, domain)) return;
+          const key = `name|${domain}`;
+          seen.add(key);
+          records.push({ provider: response.provider, url: `https://${domain}`, domain: domainOf(domain), category, pageType: pageTypeValue });
+        });
+        const officialDomain = domainOf(result.input.website || "");
+        if (officialDomain && /官网|官方网站|官方商城|官方旗舰店/.test(String(response.answer || "")) && !seenDomain(seen, officialDomain)) {
+          seen.add(`official|${officialDomain}`);
+          records.push({ provider: response.provider, url: String(result.input.website || ""), domain: officialDomain, category: "品牌官网", pageType: pageType(String(result.input.website || ""), "官网") });
+        }
+      });
+      const officialDomain = domainOf(result.input.website || "");
+      return summarizeCitationRecords(records, officialDomain, "综合", {
+        providers: [...new Set(records.map(row => row.provider))].sort().map(provider => summarizeCitationRecords(records.filter(row => row.provider === provider), officialDomain, provider))
+      });
+    }
+
+    function seenDomain(seen, domain) {
+      const normalized = domainOf(domain);
+      return [...seen].some(key => {
+        const value = String(key).split("|").slice(1).join("|");
+        return domainOf(value) === normalized;
+      });
+    }
+
+    function summarizeCitationRecords(records, officialDomain, provider, extra = {}) {
+      const total = records.length;
+      return {
+        provider,
+        total,
+        uniqueDomains: new Set(records.map(row => row.domain).filter(Boolean)).size,
+        brandShare: total ? records.filter(row => row.domain === officialDomain).length / total : 0,
+        categories: topCounts(records.map(row => row.category), 8),
+        pageTypes: topCounts(records.map(row => row.pageType), 8),
+        domains: topCounts(records.map(row => row.domain).filter(Boolean), 10),
+        urls: topCounts(records.map(row => row.url), 10),
+        ...extra,
+      };
+    }
+
+    function topCounts(values, limit) {
+      const counts = new Map();
+      values.forEach(value => counts.set(value, (counts.get(value) || 0) + 1));
+      return [...counts.entries()].sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0])).slice(0, limit);
+    }
+
+    function distributionChart(items, aria) {
+      if (!items.length) return `<p class="note">暂无可解析引用</p>`;
+      const total = items.reduce((sum, row) => sum + row[1], 0) || 1;
       const radius = 58;
       const circumference = 2 * Math.PI * radius;
-      const total = Math.max(1, parts.reduce((sum, part) => sum + part[1], 0));
+      let cumulative = 0;
+      const segments = items.map(([label, count], index) => {
+        const share = count / total;
+        const length = share * circumference;
+        const segment = `<circle cx="84" cy="84" r="${radius}" fill="none" stroke="${palette[index % palette.length]}" stroke-width="28" stroke-dasharray="${length.toFixed(2)} ${(circumference - length).toFixed(2)}" stroke-dashoffset="${(-cumulative).toFixed(2)}" transform="rotate(-90 84 84)"></circle>`;
+        cumulative += length;
+        return segment;
+      }).join("");
+      const legend = items.map(([label, count], index) => {
+        const share = count / total;
+        return `<span><i class="swatch" style="background:${palette[index % palette.length]}"></i>${escapeHtml(label)}：${Math.round(share * 100)}%，${count}次</span>`;
+      }).join("");
+      return `<div style="display:grid;grid-template-columns:180px 1fr;gap:16px;align-items:center">
+        <svg class="chart" viewBox="0 0 168 168" role="img" aria-label="${escapeHtml(aria)}">
+          <circle cx="84" cy="84" r="58" fill="none" stroke="#e5eaf0" stroke-width="28"></circle>
+          ${segments}
+          <text x="84" y="78" text-anchor="middle" font-size="22" font-weight="700" fill="#1d2733">${total}</text>
+          <text x="84" y="100" text-anchor="middle" font-size="12" fill="#667085">次</text>
+        </svg>
+        <div class="legend">${legend}</div>
+      </div>`;
+    }
+
+    function countTable(items, label) {
+      if (!items.length) return `<p class="note">暂无可解析引用</p>`;
+      const rows = items.map(([name, count]) => `<tr><td>${escapeHtml(name)}</td><td>${count}</td></tr>`).join("");
+      return `<table><tr><th>${escapeHtml(label)}</th><th>引用次数</th></tr>${rows}</table>`;
+    }
+
+    function urlTable(items) {
+      if (!items.length) return `<p class="note">暂无可解析引用</p>`;
+      const rows = items.map(([url, count]) => {
+        const safe = escapeHtml(url);
+        return `<tr><td><a href="${safe}" target="_blank" rel="noreferrer">${escapeHtml(shortUrl(url))}</a></td><td>${count}</td></tr>`;
+      }).join("");
+      return `<table><tr><th>网址</th><th>引用次数</th></tr>${rows}</table>`;
+    }
+
+    function cleanUrl(url) {
+      const text = String(url || "").trim().replace(/^`+|[.,;，。；)`]+$/g, "");
+      const clipped = text.split(/[`，。；、（）\s]/, 1)[0];
+      try {
+        const parsed = new URL(clipped.includes("://") ? clipped : `https://${clipped}`);
+        if ((parsed.pathname === "" || parsed.pathname === "/") && !parsed.search) {
+          return `${parsed.protocol}//${parsed.hostname.toLowerCase()}`;
+        }
+      } catch {}
+      return clipped;
+    }
+
+    function domainOf(url) {
+      const text = String(url || "").trim();
+      if (!text) return "";
+      try {
+        const parsed = new URL(text.includes("://") ? text : `https://${text}`);
+        return parsed.hostname.replace(/^www\./, "").toLowerCase();
+      } catch {
+        return "";
+      }
+    }
+
+    function looksLikeDomain(value) {
+      const domain = domainOf(value);
+      return domain.includes(".") && !/^\d+\.[a-z]{2,4}$/i.test(domain) && !/\.(py|js|css|json)$/.test(domain);
+    }
+
+    function knownSources() {
+      return [
+        ["国家企业信用信息公示系统", "www.gsxt.gov.cn", "权威机构", "查询页面"],
+        ["中国能效标识网", "www.energylabel.com.cn", "权威机构", "查询页面"],
+        ["市场监督管理局", "www.samr.gov.cn", "权威机构", "查询页面"],
+        ["工信部", "www.miit.gov.cn", "权威机构", "政策/公告页"],
+        ["京东", "jd.com", "电商平台", "商品/评价页"],
+        ["天猫", "tmall.com", "电商平台", "商品/评价页"],
+        ["淘宝", "taobao.com", "电商平台", "商品/评价页"],
+        ["苏宁", "suning.com", "电商平台", "商品/评价页"],
+        ["知乎", "zhihu.com", "社媒/社区", "问答页"],
+        ["小红书", "xiaohongshu.com", "社媒/社区", "内容页"],
+        ["微博", "weibo.com", "社媒/社区", "内容页"],
+        ["抖音", "douyin.com", "社媒/社区", "视频页"],
+        ["哔哩哔哩", "bilibili.com", "社媒/社区", "视频页"],
+        ["B站", "bilibili.com", "社媒/社区", "视频页"],
+        ["百度百科", "baike.baidu.com", "百科", "百科页"],
+        ["维基百科", "wikipedia.org", "百科", "百科页"],
+      ];
+    }
+
+    function normalizeCategory(sourceType, domain) {
+      const text = String(sourceType || "");
+      if (/官网|官方/.test(text)) return "品牌官网";
+      if (/电商|京东|天猫|淘宝|苏宁/.test(text)) return "电商平台";
+      if (/知乎|小红书|微博|社媒|社区|抖音|B站/.test(text)) return "社媒/社区";
+      if (/新闻|媒体|文章/.test(text)) return "新闻媒体";
+      if (/百科|wiki/i.test(text)) return "百科";
+      if (/权威|监管|机构|认证/.test(text)) return "权威机构";
+      return text || categoryFromDomain(domain);
+    }
+
+    function categoryFromDomain(domain) {
+      if (!domain) return "其他";
+      if (/(gov|edu|org)/.test(domain)) return "权威机构";
+      if (/(zhihu|xiaohongshu|weibo|bilibili|douyin)/.test(domain)) return "社媒/社区";
+      if (/(jd|tmall|taobao|amazon|suning)/.test(domain)) return "电商平台";
+      if (/(wikipedia|baike|wiki)/.test(domain)) return "百科";
+      return "网站/媒体";
+    }
+
+    function pageType(url, title) {
+      const text = `${url} ${title}`.toLowerCase();
+      if (/(product|item|goods|detail|产品)/.test(text)) return "产品页";
+      if (/(news|article|post|blog|新闻|文章)/.test(text)) return "文章/新闻";
+      if (/(faq|help|support|service|服务|帮助)/.test(text)) return "帮助/FAQ";
+      if (/(review|compare|vs|评测|对比)/.test(text)) return "评测/对比";
+      if (/(search|s\?)/.test(text)) return "搜索结果页";
+      try {
+        const parsed = new URL(url);
+        return parsed.pathname.replaceAll("/", "") ? "普通页面" : "首页";
+      } catch {
+        return "普通页面";
+      }
+    }
+
+    function scorePie(result) {
+      const parts = [
+        ["品牌提及", result.score.mention_rate_score, 40, palette[0]],
+        ["准确率", result.score.accuracy_score, 30, palette[1]],
+        ["行业/产品覆盖", result.score.industry_coverage_score, 20, palette[2]],
+        ["平台覆盖", result.score.platform_coverage_score, 10, palette[3]],
+      ];
+      return donut(parts, Number(result.score.total_score).toFixed(1), "总分", "评分构成饼图");
+    }
+
+    function voiceSharePie(competitors) {
+      const parts = competitors.slice(0, 6).map((row, index) => [row.brand, (row.voice_share || row.mention_rate) * 100, 100, palette[index % palette.length]]);
+      if (!parts.length) return `<p>暂无数据</p>`;
+      const leader = parts[0]?.[1] || 0;
+      return donut(parts, `${Math.round(leader)}%`, "最高声量", "AI 声量份额饼图");
+    }
+
+    function donut(parts, center, subtitle, aria) {
+      const radius = 58;
+      const circumference = 2 * Math.PI * radius;
+      const total = Math.max(1, parts.reduce((sum, part) => sum + Math.max(0, Number(part[1] || 0)), 0));
       let offset = 0;
       const circles = parts.map(([label, value, maxValue, color]) => {
-        const length = value / total * circumference;
+        const safeValue = Math.max(0, Number(value || 0));
+        const length = safeValue / total * circumference;
         const circle = `<circle cx="84" cy="84" r="${radius}" fill="none" stroke="${color}" stroke-width="28" stroke-dasharray="${length.toFixed(2)} ${(circumference - length).toFixed(2)}" stroke-dashoffset="${(-offset).toFixed(2)}" transform="rotate(-90 84 84)" />`;
         offset += length;
         return circle;
       }).join("");
-      const legend = parts.map(([label, value, maxValue, color]) => `<span><i class="swatch" style="background:${color}"></i>${label}：${Number(value).toFixed(1)}/${maxValue}</span>`).join("");
+      const legend = parts.map(([label, value, maxValue, color]) => {
+        const text = maxValue === 100 ? `${Math.round(Number(value || 0))}%` : `${Number(value || 0).toFixed(1)}/${maxValue}`;
+        return `<span><i class="swatch" style="background:${color}"></i>${escapeHtml(label)}：${text}</span>`;
+      }).join("");
       return `<div style="display:grid;grid-template-columns:170px 1fr;gap:14px;align-items:center">
-        <svg class="chart" viewBox="0 0 168 168" role="img" aria-label="评分构成饼图">
+        <svg class="chart" viewBox="0 0 168 168" role="img" aria-label="${escapeHtml(aria)}">
           <circle cx="84" cy="84" r="58" fill="none" stroke="#e5eaf0" stroke-width="28"></circle>
           ${circles}
-          <text x="84" y="78" text-anchor="middle" font-size="22" font-weight="700" fill="#1d2733">${Number(result.score.total_score).toFixed(1)}</text>
-          <text x="84" y="100" text-anchor="middle" font-size="12" fill="#667085">总分</text>
+          <text x="84" y="78" text-anchor="middle" font-size="22" font-weight="700" fill="#1d2733">${escapeHtml(center)}</text>
+          <text x="84" y="100" text-anchor="middle" font-size="12" fill="#667085">${escapeHtml(subtitle)}</text>
         </svg>
         <div class="legend">${legend}</div>
       </div>`;
@@ -200,14 +456,56 @@
         const barW = pct * (width - left - 72);
         return `<text x="0" y="${y + 15}" font-size="12" fill="#425466">${escapeHtml(String(label).slice(0, 18))}</text>
           <rect x="${left}" y="${y}" width="${width-left-72}" height="18" rx="5" fill="#edf3f8"></rect>
-          <rect x="${left}" y="${y}" width="${barW.toFixed(1)}" height="18" rx="5" fill="#0f766e"></rect>
+          <rect x="${left}" y="${y}" width="${barW.toFixed(1)}" height="18" rx="5" fill="${palette[index % palette.length]}"></rect>
           <text x="${width - 58}" y="${y + 14}" font-size="12" fill="#1d2733">${Math.round(value)}${suffix}</text>`;
       }).join("");
       return `<svg class="chart" viewBox="0 0 ${width} ${height}" role="img" aria-label="条形图">${bars}</svg>`;
     }
 
+    function modelGeoDiagnosisRows(result) {
+      const analysesByProvider = new Map();
+      result.analyses.forEach(analysis => {
+        if (!analysesByProvider.has(analysis.provider)) analysesByProvider.set(analysis.provider, []);
+        analysesByProvider.get(analysis.provider).push(analysis);
+      });
+      return result.score.platform_scores.map(platform => {
+        const analyses = analysesByProvider.get(platform.provider) || [];
+        const weakCount = analyses.filter(item => !item.brand_mentioned || !item.description_correct || !(item.industry_terms_covered || []).length).length;
+        const issue = modelIssue(platform, weakCount, analyses.length);
+        return `<tr><td>${escapeHtml(platform.provider)}</td><td>${escapeHtml(issue)}</td><td>${escapeHtml(modelAction(platform.provider, issue))}</td></tr>`;
+      }).join("");
+    }
+
+    function modelIssue(platform, weakCount, total) {
+      if (platform.mention_rate < 0.6) return "品牌在回答中出现不够稳定";
+      if (platform.accuracy_rate < 0.7) return "产品和品牌事实需要更清晰";
+      if (total && weakCount / total > 0.3) return "部分场景问题下表达不够完整";
+      return "表现相对稳定，可继续扩大覆盖";
+    }
+
+    function modelAction(provider, issue) {
+      if (issue === "品牌在回答中出现不够稳定") return `优先建设适合 ${provider} 抽取的品牌介绍、核心品类页、购买场景页和竞品对比页。`;
+      if (issue === "产品和品牌事实需要更清晰") return `补充参数表、型号清单、售后政策、适用人群和高频 FAQ，让 ${provider} 更容易形成准确回答。`;
+      if (issue === "部分场景问题下表达不够完整") return `围绕 ${provider} 容易触发的场景问题补案例、问答和对比结论，提升长尾问题中的推荐稳定性。`;
+      return `维持 ${provider} 已有表现，继续扩展行业场景、竞品比较和权威背书内容。`;
+    }
+
+    function voiceExplanation(result) {
+      const brand = result.input.brand_name;
+      const leader = result.competitors[0];
+      const own = result.competitors.find(row => row.brand === brand);
+      if (!leader || !own) return "本轮有效行业对比样本不足，建议扩大问题数量或接入更多 AI 平台后再观察声量变化。";
+      if (own.brand === leader.brand) return `${brand} 在本轮行业对比中处于领先位置，说明 AI 更容易把它作为同类品牌的优先候选。但仍需关注出现率和平均排名，避免只在少数问题里集中出现。`;
+      const gap = Math.max(0, (leader.voice_share || 0) - (own.voice_share || 0));
+      return `${brand} 当前声量低于 ${leader.brand}，差距约 ${Math.round(gap * 100)}%。这通常意味着 AI 在回答同类推荐时更先想到竞品，后续应补强行业场景内容、对比页和权威来源。`;
+    }
+
+    function shortUrl(url) {
+      return url.length <= 80 ? url : `${url.slice(0, 77)}...`;
+    }
+
     function escapeHtml(value) {
-      return value.replace(/[&<>"']/g, char => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[char]));
+      return String(value ?? "").replace(/[&<>"']/g, char => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[char]));
     }
 
     function percent(value) {

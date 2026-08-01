@@ -14,6 +14,7 @@ class QuestionType(str, Enum):
     SCENARIO = "scenario"
     COMPARISON = "comparison"
     DECISION = "decision"
+    CITATION_SOURCE = "citation_source"
 
 
 class BrandInput(BaseModel):
@@ -207,6 +208,7 @@ class AuditResult(BaseModel):
     geo_suggestions: list[GeoSuggestion]
     recommendation_predictions: list[RecommendationPrediction]
     tasks: list[TaskItem]
+    evidence_notes: list[str] = Field(default_factory=list)
     report_html: str | None = None
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 

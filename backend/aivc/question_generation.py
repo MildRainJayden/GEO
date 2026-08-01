@@ -100,6 +100,56 @@ def generate_questions(brand: BrandInput, count: int = 60) -> list[Question]:
     return generated
 
 
+def generate_citation_source_questions(brand: BrandInput, visibility_count: int) -> list[Question]:
+    """Generate source-discovery prompts used only for citation/source analysis."""
+    industry = brand.industry or "相关行业"
+    products = brand.products or [industry]
+    competitors = brand.competitors or ["主要竞品"]
+    regions = brand.regions or ["中国"]
+    target_count = max(8, min(30, visibility_count // 2))
+    templates = [
+        "为了核实{brand}在{industry}行业的品牌实力，你会参考哪些公开网站？请列出8-12个来源，尽量给出完整网址，并标注来源类型。",
+        "用户购买{product}前，如果要判断{brand}是否靠谱，应参考哪些第三方网站、官网页面或监管/认证页面？请给出网址。",
+        "比较{brand}和{competitor}时，哪些外部页面最值得引用？请列出公开来源、网址和页面类型。",
+        "{region}消费者了解{brand}的售后、口碑、价格和产品参数时，AI回答通常会参考哪些网站？请给出可访问的网址。",
+        "请列出判断{brand}{product}产品质量、能效、参数、评价和售后时最有价值的公开信息来源，优先给出具体网址。",
+        "如果要写一篇关于{brand}在{industry}行业竞争力的客观分析，需要引用哪些网站？请覆盖官网、媒体、电商、社区和权威机构。",
+        "请按来源可信度列出{brand}相关的公开信息入口，包括域名、页面类型、适合核实的信息。",
+        "AI回答{brand}是否值得购买时，最可能引用哪些外部网站？请列出网址，不要只写品牌名。",
+        "请列出{industry}行业用户研究{brand}和{competitor}时常用的公开网站来源，并说明每个来源适合验证什么。",
+        "围绕{brand}{product}，请给出可用于核实品牌、产品、价格、评价、服务、认证的公开网页来源清单。",
+    ]
+    generated: list[Question] = []
+    seen: set[str] = set()
+    streams = {
+        "region": cycle(regions),
+        "product": cycle(products),
+        "competitor": cycle(competitors),
+    }
+    while len(generated) < target_count:
+        start_size = len(generated)
+        for template in templates:
+            text = template.format(
+                brand=brand.brand_name,
+                industry=industry,
+                product=next(streams["product"]),
+                competitor=next(streams["competitor"]),
+                region=next(streams["region"]),
+            )
+            if text in seen:
+                continue
+            seen.add(text)
+            generated.append(Question(text=text, type=QuestionType.CITATION_SOURCE))
+            if len(generated) >= target_count:
+                return generated
+        if len(generated) == start_size:
+            index = len(generated) + 1
+            text = f"第{index}组来源探测：请列出{brand.brand_name}在{industry}行业可被AI引用的公开网站、网址和页面类型。"
+            seen.add(text)
+            generated.append(Question(text=text, type=QuestionType.CITATION_SOURCE))
+    return generated
+
+
 def _append_dynamic_question(
     brand: BrandInput,
     generated: list[Question],
