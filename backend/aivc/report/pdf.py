@@ -69,14 +69,14 @@ def write_pdf_report(result: AuditResult, output_path: str | Path) -> Path:
         ["平台覆盖", f"{result.score.platform_coverage_score}/10", "成功测评的平台中是否均有品牌曝光。"],
         ["竞争声量", f"{result.score.competitive_voice_score}/100", "品牌在行业基准对比中的相对声量、出现率和靠前度。"],
     ], [42 * mm, 28 * mm, 94 * mm], styles))
-    story.append(Paragraph("说明：总分由品牌自身可见度和行业竞争声量共同组成。自身问题回答得好但行业对比中出现少，总分会被竞争声量拉低。", styles["NoteCN"]))
+    story.append(Paragraph("说明：总分由品牌自身可见度和行业竞争声量共同组成。多模型结果会先按模型分别计算，再按国内月活规模权重与模型均衡权重综合；自身问题回答得好但行业对比中出现少，总分会被竞争声量拉低。", styles["NoteCN"]))
 
     story.append(Paragraph("平台表现", styles["HeadingCN"]))
-    story.append(Paragraph("说明：平台得分用于观察不同 AI 引擎对品牌的熟悉度和回答稳定性；多模型总分会综合所有成功返回的平台结果。", styles["NoteCN"]))
-    platform_data = [["平台", "评分", "提及率", "准确率", "中文解释"]]
+    story.append(Paragraph("说明：平台得分用于观察不同 AI 引擎对品牌的熟悉度和回答稳定性；总分按模型权重加权综合。权重默认参考国内公开月活规模，并保留一部分模型均衡权重，后续可在配置中覆盖。", styles["NoteCN"]))
+    platform_data = [["平台", "评分", "总分权重", "提及率", "准确率", "中文解释"]]
     for p in result.score.platform_scores:
-        platform_data.append([p.provider, p.score, f"{p.mention_rate:.0%}", f"{p.accuracy_rate:.0%}", p.explanation])
-    story.append(_table(platform_data, [24 * mm, 20 * mm, 22 * mm, 22 * mm, 76 * mm], styles))
+        platform_data.append([p.provider, p.score, f"{result.score.platform_weights.get(p.provider, 0):.0%}", f"{p.mention_rate:.0%}", f"{p.accuracy_rate:.0%}", p.explanation])
+    story.append(_table(platform_data, [22 * mm, 17 * mm, 19 * mm, 19 * mm, 19 * mm, 68 * mm], styles))
 
     story.append(Paragraph("AI 声量份额", styles["HeadingCN"]))
     story.append(Paragraph("说明：AI 声量份额表示在同一行业的中立推荐与对比问题中，AI 更常把哪些品牌放到靠前位置。它不是销量或市场份额，而是 AI 回答里的被看见程度。", styles["NoteCN"]))

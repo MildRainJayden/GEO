@@ -118,7 +118,7 @@
     });
 
     function renderResult(result, id) {
-      const platforms = result.score.platform_scores.map(row => `<tr><td>${escapeHtml(row.provider)}</td><td>${row.score}</td><td>${Math.round(row.mention_rate * 100)}%</td><td>${Math.round(row.accuracy_rate * 100)}%</td><td>${escapeHtml(row.explanation || "")}</td></tr>`).join("");
+      const platforms = result.score.platform_scores.map(row => `<tr><td>${escapeHtml(row.provider)}</td><td>${row.score}</td><td>${percent((result.score.platform_weights || {})[row.provider])}</td><td>${Math.round(row.mention_rate * 100)}%</td><td>${Math.round(row.accuracy_rate * 100)}%</td><td>${escapeHtml(row.explanation || "")}</td></tr>`).join("");
       const competitors = result.competitors.slice(0, 8).map(row => `<tr><td>${escapeHtml(row.brand)}</td><td>${percent(row.voice_share || row.mention_rate)}</td><td>${percent(row.occurrence_rate || row.accuracy_rate)}</td><td>${row.average_rank ? Number(row.average_rank).toFixed(2) : "-"}</td><td>${percent(row.top3_rate)}</td><td>${percent(row.scenario_coverage)}</td><td>${row.effective_sample_count || "-"}</td></tr>`).join("");
       const gaps = result.content_gaps.map(gap => `<li><strong>${escapeHtml(gap.priority)}</strong> ${escapeHtml(gap.question)}：${escapeHtml(gap.reason)}</li>`).join("");
       const suggestion = result.geo_suggestions[0] || { title: "GEO 优化建议", action: "", copyable_content: "" };
@@ -136,7 +136,7 @@
           <div class="metric">基础可见度<strong>${result.score.base_visibility_score || result.score.total_score}</strong></div>
           <div class="metric">竞争声量<strong>${result.score.competitive_voice_score || 0}</strong></div>
         </div>
-        <p class="note">评分说明：总分由品牌自身可见度和行业竞争声量共同组成。自身问题回答得好但行业对比中出现少，总分会被竞争声量拉低。</p>
+        <p class="note">评分说明：总分由品牌自身可见度和行业竞争声量共同组成。多模型结果会先按模型分别计算，再按国内月活规模权重与模型均衡权重综合；自身问题回答得好但行业对比中出现少，总分会被竞争声量拉低。</p>
         <h3>自动补全信息</h3>
         <p>${escapeHtml(result.input.industry || "未识别行业")} · ${escapeHtml(result.input.product_text || "")}</p>
         <div class="chart-grid">
@@ -144,8 +144,8 @@
           <div class="chart-card"><h3>平台得分</h3>${barChart(result.score.platform_scores.map(row => [row.provider, row.score, 100]), "")}</div>
         </div>
         <h3>平台表现</h3>
-        <p class="note">说明：平台得分用于观察不同 AI 引擎对品牌的熟悉度和回答稳定性；多模型总分会综合所有成功返回的平台结果。</p>
-        <table><tr><th>平台</th><th>评分</th><th>提及率</th><th>准确率</th><th>解释</th></tr>${platforms}</table>
+        <p class="note">说明：平台得分用于观察不同 AI 引擎对品牌的熟悉度和回答稳定性；总分按模型权重加权综合。权重默认参考国内公开月活规模，并保留一部分模型均衡权重，后续可在配置中覆盖。</p>
+        <table><tr><th>平台</th><th>评分</th><th>总分权重</th><th>提及率</th><th>准确率</th><th>解释</th></tr>${platforms}</table>
         <h3>AI 声量份额</h3>
         <p class="note">说明：AI 声量份额表示在同一行业的中立推荐与对比问题中，AI 更常把哪些品牌放到靠前位置。它不是销量或市场份额，而是 AI 回答里的被看见程度。</p>
         <div class="voice-grid">
@@ -168,6 +168,8 @@
         ${taskPrompts}
         <p><a href="/audit/${id}/report" target="_blank" rel="noreferrer">打开 HTML 报告</a></p>
         <p><a href="/audit/${id}/report.pdf" target="_blank" rel="noreferrer">下载 PDF 报告</a></p>
+        <p><a href="/audit/${id}/evidence" target="_blank" rel="noreferrer">打开审计附录</a></p>
+        <p><a href="/audit/${id}/evidence.json" target="_blank" rel="noreferrer">打开证据包 JSON</a></p>
       `;
     }
 

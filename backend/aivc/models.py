@@ -140,6 +140,8 @@ class ScoreBreakdown(BaseModel):
     competitive_voice_score: float = 0.0
     base_visibility_score: float = 0.0
     platform_scores: list[PlatformScore]
+    platform_weights: dict[str, float] = Field(default_factory=dict)
+    platform_weight_basis: dict[str, float] = Field(default_factory=dict)
     trend_score: float
 
 

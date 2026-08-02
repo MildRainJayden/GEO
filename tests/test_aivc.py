@@ -9,11 +9,13 @@ os.environ["AIVC_DISABLE_REAL_PROVIDERS"] = "1"
 os.environ["AIVC_DISABLE_WEB_RESEARCH"] = "1"
 
 from backend.aivc.cli import NIKE_REQUEST
+from backend.aivc.analysis.provider_weights import normalized_provider_weights
 from backend.aivc.analysis.scoring import apply_competitive_voice_score, compute_visibility_score
 from backend.aivc.models import AuditRequest, BrandInput, BrandMentionAnalysis, Citation, CompetitorMetric, ProviderResponse, Question
 from backend.aivc.providers.base import ProviderClient, ProviderRegistry
 from backend.aivc.providers.simulated import ProviderProfile, SimulatedProvider
 from backend.aivc.analysis.recommendation import build_industry_benchmark_matrix
+from backend.aivc.report.evidence import build_evidence_payload, render_evidence_html
 from backend.aivc.report.citation_insights import build_citation_insights
 from backend.aivc.services.research_service import enrich_request
 from backend.aivc.question_generation import generate_questions
@@ -105,6 +107,48 @@ class AIVCTestCase(unittest.TestCase):
         score = compute_visibility_score(analyses, responses, provider_count=1)
         self.assertLess(score.total_score, 100)
         self.assertEqual(score.total_score, 82.0)
+
+    def test_provider_weights_use_mau_with_equal_share_smoothing(self) -> None:
+        weights = normalized_provider_weights(["doubao", "qwen", "deepseek"])
+        self.assertAlmostEqual(sum(weights.values()), 1.0, places=4)
+        self.assertGreater(weights["doubao"], weights["qwen"])
+        self.assertGreater(weights["qwen"], weights["deepseek"])
+        self.assertGreater(weights["deepseek"], 0.2)
+
+    def test_multi_provider_score_uses_weighted_average(self) -> None:
+        analyses: list[BrandMentionAnalysis] = []
+        responses: list[ProviderResponse] = []
+        for provider, mentioned in [("doubao", False), ("qwen", True), ("deepseek", True)]:
+            for index in range(10):
+                question_id = f"{provider}-{index}"
+                analyses.append(
+                    BrandMentionAnalysis(
+                        provider=provider,
+                        question_id=question_id,
+                        brand_mentioned=mentioned,
+                        mention_count=1 if mentioned else 0,
+                        recommendation_position="Top5" if mentioned else "未推荐",
+                        sentiment="积极" if mentioned else "中性",
+                        description_correct=mentioned,
+                        industry_terms_covered=["家电"] if mentioned else [],
+                    )
+                )
+                responses.append(
+                    ProviderResponse(
+                        provider=provider,
+                        model_version="test",
+                        question_id=question_id,
+                        question="测试问题",
+                        answer="测试回答",
+                        latency_ms=1,
+                        token_count=10,
+                    )
+                )
+        score = compute_visibility_score(analyses, responses, provider_count=3)
+        self.assertAlmostEqual(sum(score.platform_weights.values()), 1.0, places=4)
+        self.assertGreater(score.platform_weights["doubao"], score.platform_weights["qwen"])
+        self.assertLess(score.mention_rate_score, 26.67)
+        self.assertGreater(score.mention_rate_score, 20.0)
 
     def test_low_competitive_voice_reduces_total_score(self) -> None:
         analyses = [
@@ -284,6 +328,28 @@ class AIVCTestCase(unittest.TestCase):
         self.assertIn(("midea.com", 1), insights.domains)
         self.assertIn(("jd.com", 1), insights.domains)
         self.assertIn(("电商平台", 1), insights.categories)
+
+    def test_evidence_payload_traces_questions_answers_and_sources(self) -> None:
+        async def run() -> None:
+            service = AuditService()
+            record = await service.create_audit(AuditRequest(brand_name="美的", providers=["deepseek"], question_count=10))
+            self.assertEqual(record.status, "completed")
+            result = record.result
+            assert result is not None
+            payload = build_evidence_payload(result)
+            html = render_evidence_html(result)
+            self.assertEqual(payload["audit_id"], result.audit_id)
+            self.assertIn("sha256", payload)
+            self.assertGreater(payload["sample_summary"]["question_count"], 10)
+            self.assertEqual(payload["sample_summary"]["response_count"], len(result.responses))
+            self.assertTrue(payload["responses"])
+            self.assertTrue(any(row["answer"] for row in payload["responses"]))
+            self.assertIn("citation_source", payload["sample_summary"]["question_type_counts"])
+            self.assertIn("评分只使用", "。".join(payload["methodology_notes"]))
+            self.assertIn("测评证据包", html)
+            self.assertIn("原始问题与回答", html)
+
+        asyncio.run(run())
 
 
 class FailingProvider(ProviderClient):

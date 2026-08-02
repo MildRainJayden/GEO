@@ -9,6 +9,7 @@ from urllib.parse import urlparse
 from pydantic import ValidationError
 
 from ..models import AuditRequest
+from ..report.evidence import build_evidence_payload, render_evidence_html
 from ..report.pdf import write_pdf_report
 from ..services.audit_service import default_service
 
@@ -58,6 +59,18 @@ class AIVCRequestHandler(BaseHTTPRequestHandler):
                 output_path = Path("outputs") / f"{record.id}-report.pdf"
                 write_pdf_report(record.result, output_path)
                 self._send_bytes(output_path.read_bytes(), "application/pdf")
+                return
+            if len(parts) == 3 and parts[2] == "evidence":
+                if not record.result:
+                    self._send_json({"error": "evidence not ready"}, 409)
+                    return
+                self._send_html(render_evidence_html(record.result))
+                return
+            if len(parts) == 3 and parts[2] == "evidence.json":
+                if not record.result:
+                    self._send_json({"error": "evidence not ready"}, 409)
+                    return
+                self._send_json(build_evidence_payload(record.result))
                 return
         self._send_json({"error": "not found"}, 404)
 

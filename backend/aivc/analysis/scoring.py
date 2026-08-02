@@ -3,6 +3,7 @@ from __future__ import annotations
 from collections import defaultdict
 
 from ..models import BrandMentionAnalysis, CompetitorMetric, PlatformScore, ProviderResponse, ScoreBreakdown
+from .provider_weights import normalized_provider_weights, provider_raw_mau
 
 
 def compute_visibility_score(
@@ -11,14 +12,19 @@ def compute_visibility_score(
     provider_count: int,
 ) -> ScoreBreakdown:
     total = len(analyses) or 1
-    mention_rate = sum(a.brand_mentioned for a in analyses) / total
-    top3_rate = sum(a.recommendation_position in {"Top1", "Top3"} for a in analyses) / total
-    accuracy_rate = sum(a.description_correct for a in analyses) / total
-    covered_providers = len({a.provider for a in analyses if a.brand_mentioned})
-    platform_coverage = covered_providers / max(provider_count, 1)
-    citation_quality = _citation_quality(responses)
-    industry_coverage = sum(bool(a.industry_terms_covered) for a in analyses) / total
-    quality_signal_rate = _quality_signal_rate(analyses, responses)
+    providers = sorted({analysis.provider for analysis in analyses} | {response.provider for response in responses})
+    weights = normalized_provider_weights(providers)
+    mention_rate = _weighted_provider_rate(analyses, weights, lambda item: item.brand_mentioned)
+    top3_rate = _weighted_provider_rate(analyses, weights, lambda item: item.recommendation_position in {"Top1", "Top3"})
+    accuracy_rate = _weighted_provider_rate(analyses, weights, lambda item: item.description_correct)
+    platform_coverage = sum(
+        weights.get(provider, 0.0)
+        for provider in providers
+        if any(a.provider == provider and a.brand_mentioned for a in analyses)
+    )
+    citation_quality = _weighted_citation_quality(responses, weights)
+    industry_coverage = _weighted_provider_rate(analyses, weights, lambda item: bool(item.industry_terms_covered))
+    quality_signal_rate = _weighted_quality_signal_rate(analyses, responses, weights)
     confidence = _sample_confidence(total, provider_count)
 
     raw_score = (
@@ -42,6 +48,8 @@ def compute_visibility_score(
         competitive_voice_score=0.0,
         base_visibility_score=round(total_score, 2),
         platform_scores=_platform_scores(analyses, responses),
+        platform_weights={provider: round(weight, 4) for provider, weight in weights.items()},
+        platform_weight_basis={provider: round(provider_raw_mau(provider), 2) for provider in weights},
         trend_score=round(min(100, total_score + 7.5), 2),
     )
 
@@ -87,6 +95,42 @@ def _citation_quality(responses: list[ProviderResponse]) -> float:
     if not citations:
         return 0
     return sum(c.authority for c in citations) / len(citations)
+
+
+def _weighted_provider_rate(
+    analyses: list[BrandMentionAnalysis],
+    weights: dict[str, float],
+    predicate,
+) -> float:
+    if not analyses:
+        return 0.0
+    grouped: dict[str, list[BrandMentionAnalysis]] = defaultdict(list)
+    for analysis in analyses:
+        grouped[analysis.provider].append(analysis)
+    if not weights:
+        return sum(predicate(analysis) for analysis in analyses) / len(analyses)
+    score = 0.0
+    for provider, items in grouped.items():
+        provider_rate = sum(predicate(item) for item in items) / (len(items) or 1)
+        score += weights.get(provider, 0.0) * provider_rate
+    return score
+
+
+def _weighted_citation_quality(
+    responses: list[ProviderResponse],
+    weights: dict[str, float],
+) -> float:
+    if not responses:
+        return 0.0
+    grouped: dict[str, list[ProviderResponse]] = defaultdict(list)
+    for response in responses:
+        grouped[response.provider].append(response)
+    if not weights:
+        return _citation_quality(responses)
+    score = 0.0
+    for provider, items in grouped.items():
+        score += weights.get(provider, 0.0) * _citation_quality(items)
+    return score
 
 
 def _platform_scores(
@@ -179,3 +223,24 @@ def _quality_signal_rate(
     cited_question_ids = {response.question_id for response in responses if response.citations}
     citation_hits = sum(a.question_id in cited_question_ids for a in analyses)
     return (top3_hits + citation_hits) / (total * 2)
+
+
+def _weighted_quality_signal_rate(
+    analyses: list[BrandMentionAnalysis],
+    responses: list[ProviderResponse],
+    weights: dict[str, float],
+) -> float:
+    if not analyses:
+        return 0.0
+    grouped: dict[str, list[BrandMentionAnalysis]] = defaultdict(list)
+    response_grouped: dict[str, list[ProviderResponse]] = defaultdict(list)
+    for analysis in analyses:
+        grouped[analysis.provider].append(analysis)
+    for response in responses:
+        response_grouped[response.provider].append(response)
+    if not weights:
+        return _quality_signal_rate(analyses, responses)
+    score = 0.0
+    for provider, items in grouped.items():
+        score += weights.get(provider, 0.0) * _quality_signal_rate(items, response_grouped[provider])
+    return score

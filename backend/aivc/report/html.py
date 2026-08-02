@@ -13,7 +13,7 @@ PALETTE = ["#0f766e", "#2563eb", "#ca8a04", "#7c3aed", "#dc2626", "#0891b2", "#9
 def render_report_html(result: AuditResult) -> str:
     score = result.score
     platform_rows = "".join(
-        f"<tr><td>{escape(p.provider)}</td><td>{p.score}</td><td>{p.mention_rate:.0%}</td><td>{p.accuracy_rate:.0%}</td><td>{escape(p.explanation)}</td></tr>"
+        f"<tr><td>{escape(p.provider)}</td><td>{p.score}</td><td>{score.platform_weights.get(p.provider, 0):.0%}</td><td>{p.mention_rate:.0%}</td><td>{p.accuracy_rate:.0%}</td><td>{escape(p.explanation)}</td></tr>"
         for p in score.platform_scores
     )
     competitor_rows = "".join(_competitor_row(c) for c in result.competitors)
@@ -95,14 +95,14 @@ def render_report_html(result: AuditResult) -> str:
       <div class="metric">平台覆盖<strong>{score.platform_coverage_score}/10</strong></div>
       <div class="metric">竞争声量<strong>{score.competitive_voice_score}/100</strong></div>
     </div>
-    <p class="note">评分说明：总分由“品牌自身可见度”和“行业竞争声量”共同组成。自身问题回答得好但行业对比中出现少，总分会被竞争声量拉低；这更接近客户真正关心的“AI 会不会在同类推荐里想起你”。</p>
+    <p class="note">评分说明：总分由“品牌自身可见度”和“行业竞争声量”共同组成。多模型结果会先按模型分别计算，再按国内月活规模权重与模型均衡权重综合，避免单一模型左右结论。自身问题回答得好但行业对比中出现少，总分会被竞争声量拉低；这更接近客户真正关心的“AI 会不会在同类推荐里想起你”。</p>
     <div class="chart-grid">
       <section class="chart-card"><h3>评分构成</h3>{score_chart}</section>
       <section class="chart-card"><h3>平台得分</h3>{platform_chart}</section>
     </div>
     <h2>平台表现</h2>
-    <p class="note">说明：平台得分用于观察不同 AI 引擎对品牌的熟悉度和回答稳定性；多模型总分会综合所有成功返回的平台结果。</p>
-    <table><tr><th>平台</th><th>评分</th><th>提及率</th><th>准确率</th><th>中文解释</th></tr>{platform_rows}</table>
+    <p class="note">说明：平台得分用于观察不同 AI 引擎对品牌的熟悉度和回答稳定性；总分按模型权重加权综合。权重默认参考国内公开月活规模，并保留一部分模型均衡权重，后续可在配置中覆盖。</p>
+    <table><tr><th>平台</th><th>评分</th><th>总分权重</th><th>提及率</th><th>准确率</th><th>中文解释</th></tr>{platform_rows}</table>
     <h2>AI 声量份额</h2>
     <p class="note">说明：AI 声量份额表示在同一行业的中立推荐与对比问题中，AI 更常把哪些品牌放到靠前位置。它不是销量或市场份额，而是“AI 回答里的被看见程度”。</p>
     <div class="voice-grid">

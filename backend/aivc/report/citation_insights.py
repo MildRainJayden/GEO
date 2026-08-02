@@ -92,6 +92,10 @@ def build_citation_insights(result: AuditResult) -> CitationInsights:
     )
 
 
+def build_citation_records(result: AuditResult) -> list[CitationRecord]:
+    return _citation_records(result)
+
+
 def _summarize_records(
     records: list[CitationRecord],
     brand_domain: str,
